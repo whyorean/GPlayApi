@@ -23,7 +23,6 @@ class ApiHelper(authData: AuthData) {
     companion object : SingletonHolder<ApiHelper, AuthData>(::ApiHelper)
 
     val appDetailsHelper = AppDetailsHelper(authData)
-        get
     val browseHelper = BrowseHelper(authData)
     val categoryHelper = CategoryHelper(authData)
     val myAppsHelper = MyAppsHelper(authData)
