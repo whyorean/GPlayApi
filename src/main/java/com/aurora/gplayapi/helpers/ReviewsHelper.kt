@@ -35,7 +35,7 @@ class ReviewsHelper(authData: AuthData) : BaseHelper(authData) {
 
     @Throws(Exception::class)
     private fun getReviewResponse(url: String, params: Map<String, String>, headers: Map<String, String>): ReviewResponse? {
-        val responseBody = getResponse(url, headers, params)
+        val responseBody = getResponse(url, params, headers)
         val payload = getPayLoadFromBytes(responseBody!!.bytes())
         return if (payload != null && payload.hasReviewResponse()) payload.reviewResponse else null
     }
