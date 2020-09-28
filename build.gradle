@@ -1,0 +1,64 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.12")
+    }
+}
+
+plugins {
+    id("com.google.protobuf") version("0.8.12")
+    id("org.jetbrains.kotlin.jvm") version("1.4.10")
+}
+
+group("com.aurora")
+version("3.0")
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "com.google.protobuf:protobuf-javalite:3.8.0"
+
+    //Square
+    implementation "com.squareup.retrofit2:retrofit:2.8.1"
+    implementation "com.squareup.retrofit2:converter-protobuf:2.8.1"
+    implementation "com.squareup.retrofit2:converter-scalars:2.8.1"
+}
+
+sourceSets {
+    main.kotlin.srcDirs += "src/main/java"
+    main.kotlin.srcDirs += "build/generated/source/proto/main/java"
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = ("UTF-8")
+}
+
+jar {
+    exclude("*.proto")
+}
+
+clean {
+    delete protobuf.generatedFilesBaseDir
+}
+
+protobuf {
+    protoc {
+        artifact = ("com.google.protobuf:protoc:3.8.0")
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option("lite")
+                }
+            }
+        }
+    }
+}
+
+
