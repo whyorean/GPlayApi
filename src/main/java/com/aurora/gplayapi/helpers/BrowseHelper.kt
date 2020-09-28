@@ -17,6 +17,7 @@ package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.ResponseWrapper
+import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.HttpClient
@@ -24,6 +25,9 @@ import java.io.IOException
 import java.util.*
 
 class BrowseHelper(authData: AuthData) : BaseHelper(authData) {
+
+    companion object : SingletonHolder<BrowseHelper, AuthData>(::BrowseHelper)
+
     @Throws(IOException::class)
     fun getAllCategoriesList(type: Type) {
         val headers: MutableMap<String, String> = getDefaultHeaders(authData)

@@ -17,6 +17,7 @@ package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.ReviewResponse
+import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.UserReviewsResponse
 import com.aurora.gplayapi.data.builders.ReviewBuilder.build
 import com.aurora.gplayapi.data.models.AuthData
@@ -25,8 +26,12 @@ import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.HttpClient
 import java.util.*
 
-class ReviewsHelper(authData: AuthData?) : BaseHelper(authData!!) {
-    private var offset = 1
+class ReviewsHelper(authData: AuthData) : BaseHelper(authData) {
+
+    companion object : SingletonHolder<ReviewsHelper, AuthData>(::ReviewsHelper) {
+        var offset = 1
+        val DEFAULT_SIZE = 20
+    }
 
     @Throws(Exception::class)
     private fun getReviewResponse(url: String, params: Map<String, String>, headers: Map<String, String>): ReviewResponse? {
@@ -110,9 +115,5 @@ class ReviewsHelper(authData: AuthData?) : BaseHelper(authData!!) {
     @Throws(Exception::class)
     fun next(packageName: String, filter: Review.Filter): List<Review> {
         return getReviews(packageName, filter, ++offset * DEFAULT_SIZE, DEFAULT_SIZE)
-    }
-
-    companion object {
-        const val DEFAULT_SIZE = 20
     }
 }

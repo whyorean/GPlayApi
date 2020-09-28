@@ -17,6 +17,7 @@ package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.Item
+import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.Category
 import com.aurora.gplayapi.data.models.subcategory.SubCategoryBundle
@@ -25,6 +26,8 @@ import com.aurora.gplayapi.network.HttpClient
 import java.util.*
 
 class CategoryHelper(authData: AuthData) : BaseHelper(authData) {
+
+    companion object : SingletonHolder<CategoryHelper, AuthData>(::CategoryHelper)
 
     @Throws(Exception::class)
     fun getAllCategoriesList(type: Category.Type): List<Category> {

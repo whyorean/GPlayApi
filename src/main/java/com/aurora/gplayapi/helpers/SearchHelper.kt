@@ -26,6 +26,29 @@ import okhttp3.ResponseBody
 import java.util.*
 
 class SearchHelper(authData: AuthData) : BaseHelper(authData) {
+
+    companion object : SingletonHolder<SearchHelper, AuthData>(::SearchHelper){
+        private const val SEARCH_TYPE_EXTRA = "_-"
+        private fun getSubBundle(item: Item): SubBundle {
+            var nextPageUrl = String()
+            try {
+                nextPageUrl = item.containerMetadata.nextPageUrl
+                if (nextPageUrl.isNotBlank()) {
+                    if (nextPageUrl.contains(SEARCH_TYPE_EXTRA)) {
+                        if (nextPageUrl.startsWith("getCluster?enpt=CkC"))
+                            return SubBundle(nextPageUrl, SearchBundle.Type.SIMILAR)
+                        if (nextPageUrl.startsWith("getCluster?enpt=CkG"))
+                            return SubBundle(nextPageUrl, SearchBundle.Type.RELATED_TO_YOUR_SEARCH)
+                    } else {
+                        return SubBundle(nextPageUrl, SearchBundle.Type.GENERIC)
+                    }
+                }
+            } catch (ignored: Exception) {
+            }
+            return SubBundle(nextPageUrl, SearchBundle.Type.BOGUS)
+        }
+    }
+
     private val bundleSet: MutableSet<SubBundle> = HashSet()
     private var query: String = String()
 
@@ -110,27 +133,5 @@ class SearchHelper(authData: AuthData) : BaseHelper(authData) {
         }
         searchBundle.appList = appList
         return searchBundle
-    }
-
-    companion object {
-        private const val SEARCH_TYPE_EXTRA = "_-"
-        private fun getSubBundle(item: Item): SubBundle {
-            var nextPageUrl = String()
-            try {
-                nextPageUrl = item.containerMetadata.nextPageUrl
-                if (nextPageUrl.isNotBlank()) {
-                    if (nextPageUrl.contains(SEARCH_TYPE_EXTRA)) {
-                        if (nextPageUrl.startsWith("getCluster?enpt=CkC"))
-                            return SubBundle(nextPageUrl, SearchBundle.Type.SIMILAR)
-                        if (nextPageUrl.startsWith("getCluster?enpt=CkG"))
-                            return SubBundle(nextPageUrl, SearchBundle.Type.RELATED_TO_YOUR_SEARCH)
-                    } else {
-                        return SubBundle(nextPageUrl, SearchBundle.Type.GENERIC)
-                    }
-                }
-            } catch (ignored: Exception) {
-            }
-            return SubBundle(nextPageUrl, SearchBundle.Type.BOGUS)
-        }
     }
 }

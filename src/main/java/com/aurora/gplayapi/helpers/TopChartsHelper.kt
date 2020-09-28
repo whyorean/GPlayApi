@@ -16,6 +16,7 @@
 package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.GooglePlayApi
+import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.StreamCluster
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
@@ -23,6 +24,8 @@ import com.aurora.gplayapi.network.HttpClient
 import java.util.*
 
 class TopChartsHelper(authData: AuthData) : BaseHelper(authData) {
+
+    companion object : SingletonHolder<TopChartsHelper, AuthData>(::TopChartsHelper)
 
     @Throws(Exception::class)
     fun getTopChartStream(type: Type, chart: Chart): StreamCluster? {

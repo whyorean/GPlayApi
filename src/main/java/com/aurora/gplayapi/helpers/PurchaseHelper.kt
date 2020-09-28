@@ -15,11 +15,8 @@
 
 package com.aurora.gplayapi.helpers
 
-import com.aurora.gplayapi.BuyResponse
+import com.aurora.gplayapi.*
 import com.aurora.gplayapi.Constants.PATCH_FORMAT
-import com.aurora.gplayapi.DeliveryResponse
-import com.aurora.gplayapi.GooglePlayApi
-import com.aurora.gplayapi.ResponseWrapper
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.File
 import com.aurora.gplayapi.data.providers.HeaderProvider
@@ -28,6 +25,8 @@ import java.io.IOException
 import java.util.*
 
 class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
+
+    companion object : SingletonHolder<PurchaseHelper, AuthData>(::PurchaseHelper)
 
     @Throws(Exception::class)
     fun getBuyResponse(packageName: String, versionCode: Int, offerType: Int): BuyResponse? {

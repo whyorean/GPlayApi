@@ -17,6 +17,7 @@ package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.ListResponse
+import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.StreamCluster
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
@@ -24,6 +25,8 @@ import com.aurora.gplayapi.network.HttpClient
 import java.util.*
 
 class StreamHelper(authData: AuthData) : BaseHelper(authData) {
+
+    companion object : SingletonHolder<StreamHelper, AuthData>(::StreamHelper)
 
     @Throws(Exception::class)
     fun getList(type: Type, category: Category?): ListResponse? {

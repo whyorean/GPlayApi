@@ -16,6 +16,7 @@
 package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.GooglePlayApi
+import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.builders.AppBuilder
 import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.AuthData
@@ -27,6 +28,8 @@ import okhttp3.RequestBody
 import java.util.*
 
 class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
+
+    companion object : SingletonHolder<AppDetailsHelper, AuthData>(::AppDetailsHelper)
 
     @Throws(Exception::class)
     fun getAppByPackageName(packageName: String): App? {
