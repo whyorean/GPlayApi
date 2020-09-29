@@ -74,3 +74,8 @@ Use one of the following tools
 	    appList = helper.next()  
 	}
 
+## Credits
+1. [googleplay-api](https://github.com/egirault/googleplay-api)
+2. [google-play-crawler](https://github.com/Akdeniz/google-play-crawler)
+3. [play-store-api](https://github.com/yeriomin/play-store-api)
+4. [raccon4](https://github.com/onyxbits/raccoon4)
