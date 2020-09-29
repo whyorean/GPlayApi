@@ -2,6 +2,19 @@
 
 Google Play Store Protobuf API wrapper in Kotlin
 
+**For Educational & Research purpose only
+
+## Disclaimer
+
+I'm not resposible for anything that may go wrong with:
+1. You 
+2. Your Google Account.
+3. Socio-economic Life, especially the nudes.
+4. Girlfriend.
+5. Crypto Wallet.
+
+***Hold your own beer!
+
 ## Build
 
     git clone https://gitlab.com/AuroraOSS/gplayapi.git
