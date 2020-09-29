@@ -15,10 +15,10 @@
 
 package com.aurora.gplayapi.helpers
 
+import com.aurora.gplayapi.GetReviewsResponse
 import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.ReviewResponse
 import com.aurora.gplayapi.SingletonHolder
-import com.aurora.gplayapi.UserReviewsResponse
 import com.aurora.gplayapi.data.builders.ReviewBuilder.build
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.Review
@@ -47,7 +47,7 @@ class ReviewsHelper(authData: AuthData) : BaseHelper(authData) {
         return if (payload != null && payload.hasReviewResponse()) payload.reviewResponse else null
     }
 
-    private fun getUserReviewsResponse(reviewResponse: ReviewResponse?): UserReviewsResponse? {
+    private fun getUserReviewsResponse(reviewResponse: ReviewResponse?): GetReviewsResponse? {
         return reviewResponse?.userReviewsResponse
     }
 

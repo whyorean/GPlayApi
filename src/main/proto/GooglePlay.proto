@@ -11,26 +11,29 @@ message AndroidAppDeliveryData {
   repeated HttpCookie downloadAuthCookie = 5;
   optional bool forwardLocked = 6;
   optional int64 refundTimeout = 7;
-  optional bool serverInitiated = 8;
+  optional bool serverInitiated = 8 [default = true];
   optional int64 postInstallRefundWindowMillis = 9;
   optional bool immediateStartNeeded = 10;
   optional AndroidAppPatchData patchData = 11;
   optional EncryptionParams encryptionParams = 12;
-  optional string gzippedDownloadUrl = 13;
-  optional int64 gzippedDownloadSize = 14;
+  optional string compressedDownloadUrl = 13;
+  optional int64 compressedSize = 14;
   repeated SplitDeliveryData splitDeliveryData = 15;
   optional int32 installLocation = 16;
+  optional int64 type = 17;
+  optional CompressedAppData compressedAppData = 18;
   optional string sha256 = 19;
 }
 
 message SplitDeliveryData {
   optional string name = 1;
   optional int64 downloadSize = 2;
-  optional int64 gzippedDownloadSize = 3;
+  optional int64 compressedSize = 3;
   optional string sha1 = 4;
   optional string downloadUrl = 5;
-  optional string gzippedDownloadUrl = 6;
+  optional string compressedDownloadUrl = 6;
   optional AndroidAppPatchData patchData = 7;
+  optional CompressedAppData compressedAppData = 8;
   optional string sha256 = 9;
 }
 
@@ -38,8 +41,14 @@ message AndroidAppPatchData {
   optional int32 baseVersionCode = 1;
   optional string baseSha1 = 2;
   optional string downloadUrl = 3;
-  optional int32 patchFormat = 4;
+  optional int32 patchFormat = 4[default = 1];
   optional int64 maxPatchSize = 5;
+}
+
+message CompressedAppData{
+  optional int64 type = 1;
+  optional int64 size = 2;
+  optional string downloadUrl = 3;
 }
 
 message AppFileMetadata {
@@ -47,15 +56,16 @@ message AppFileMetadata {
   optional int32 versionCode = 2;
   optional int64 size = 3;
   optional string downloadUrl = 4;
-  optional int64 sizeGzipped = 6;
-  optional string downloadUrlGzipped = 7;
+  optional AndroidAppPatchData patchData = 5;
+  optional int64 compressedSize = 6;
+  optional string compressedDownloadUrl = 7;
   optional string sha1 = 8;
 }
 
 message EncryptionParams {
   optional int32 version = 1;
   optional string encryptionKey = 2;
-  optional string hmacKey = 3;
+  optional string hMacKey = 3;
 }
 
 message HttpCookie {
@@ -84,16 +94,8 @@ message Address {
 message BrowseLink {
   optional string name = 1;
   optional string dataUrl = 3;
-  optional UnknownCategoryContainer unknownCategoryContainer = 4;
+  optional bytes serverLogsCookie = 4;
   optional Image icon = 5;
-}
-
-message UnknownCategoryContainer {
-  optional CategoryIdContainer categoryIdContainer = 5;
-}
-
-message CategoryIdContainer {
-  optional string categoryId = 4;
 }
 
 message BrowseResponse {
@@ -101,16 +103,22 @@ message BrowseResponse {
   optional string promoUrl = 2;
   repeated BrowseLink category = 3;
   repeated BrowseLink breadcrumb = 4;
-  optional CategoryContainer categoryContainer = 9;
   repeated QuickLink quickLink = 5;
   optional bytes serverLogsCookie = 6;
+  optional string title = 7;
+  optional int32 backendId = 8;
+  optional BrowseTab browseTab = 9;
+  optional int32 landingTabIndex = 10;
+  optional int32 quickLinkTabIndex = 11;
+  optional int32 quickLinkFallbackTabIndex = 12;
+  optional bool isFamilySafe = 14;
 }
 
 message DirectPurchase {
   optional string detailsUrl = 1;
-  optional string purchaseDocid = 2;
-  optional string parentDocid = 3;
-  optional int32 offerType = 4;
+  optional string purchaseItemId = 2;
+  optional string parentItemId = 3;
+  optional int32 offerType = 4[default = 1];
 }
 
 message RedeemGiftCard {
@@ -126,10 +134,16 @@ message ResolvedLink {
   optional string homeUrl = 5;
   optional RedeemGiftCard redeemGiftCard = 6;
   optional bytes serverLogsCookie = 7;
-  optional Docid docid = 8;
+  optional DocId DocId = 8;
   optional string wishlistUrl = 9;
   optional int32 backend = 10;
   optional string query = 11;
+  optional string myAccountUrl = 12;
+  optional HelpCenter helpCenter = 13;
+}
+
+message HelpCenter {
+  optional string contextId = 1;
 }
 
 message QuickLink {
@@ -142,8 +156,16 @@ message QuickLink {
   optional bool prismStyle = 7;
 }
 
-message CategoryContainer {
-  repeated BrowseLink category = 4;
+message BrowseTab {
+  optional string title = 1;
+  optional bytes serverLogsCookie = 2;
+  optional string listUrl = 3;
+  repeated BrowseLink browseLink = 4;
+  repeated QuickLink quickLink = 5;
+  optional string quickLinkTitle = 6;
+  optional string categoriesTitle = 7;
+  optional int32 backendId = 8;
+  optional string highlightsBannerUrl = 9;
 }
 
 message BuyResponse {
@@ -185,12 +207,13 @@ message BuyResponse {
   optional PurchaseStatusResponse purchaseStatusResponse = 39;
   optional string purchaseCookie = 46;
   optional Challenge challenge = 49;
-  optional string downloadToken = 55;
   optional string addInstrumentPromptHtml = 50;
   optional string confirmButtonText = 51;
   optional string permissionErrorTitleText = 52;
   optional string permissionErrorMessageText = 53;
   optional bytes serverLogsCookie = 54;
+  optional string encodedDeliveryToken = 55;
+  optional string unknownToken = 56;
 }
 
 message LineItem {
@@ -222,6 +245,16 @@ message PurchaseStatusResponse {
   optional LibraryUpdate libraryUpdate = 6;
   optional Instrument rejectedInstrument = 7;
   optional AndroidAppDeliveryData appDeliveryData = 8;
+}
+
+message PurchaseHistoryDetails {
+  optional int64 purchaseTimestampMillis = 2;
+  optional string purchaseDetailsHtml = 3;
+  optional Offer offer = 5;
+  optional string purchaseStatus = 6;
+  optional string titleBylineHtml = 7;
+  optional bytes clientRefundContext = 8;
+  optional Image purchaseDetailsImage = 9;
 }
 
 message BillingProfileResponse {
@@ -366,76 +399,9 @@ message RedeemedPromoOffer {
   optional Image image = 3;
 }
 
-message ActiveExperiments {
-  repeated string clientAlteringExperiment = 1;
-  repeated string otherExperiment = 2;
-  repeated int32 gwsExperiment = 3;
-}
-
-message AndroidClientInfo {
-  optional int64 androidId = 1;
-  optional string loggingId = 2;
-  optional int32 sdkVersion = 3;
-  optional string model = 4;
-  optional string product = 5;
-  optional string osBuild = 6;
-  optional string applicationBuild = 7;
-  optional string hardware = 8;
-  optional string device = 9;
-  optional string mccMnc = 10;
-  optional string locale = 11;
-  optional string country = 12;
-}
-
-message ClientInfo {
-  optional int32 clientType = 1;
-  optional AndroidClientInfo androidClientInfo = 2;
-  optional DesktopClientInfo desktopClientInfo = 3;
-  optional IosClientInfo iosClientInfo = 4;
-}
-
-message DesktopClientInfo {
-  optional string clientId = 1;
-  optional string loggingId = 2;
-  optional string os = 3;
-  optional string osMajorVersion = 4;
-  optional string osFullVersion = 5;
-  optional string applicationBuild = 6;
-}
-
-message ExperimentIdList {
-  repeated string id = 1;
-}
-
-message IosClientInfo {
-  optional string clientId = 1;
-  optional string loggingId = 2;
-  optional string osMajorVersion = 3;
-  optional string osFullVersion = 4;
-  optional string applicationBuild = 5;
-}
-
-message LogEvent {
-  optional int64 eventTimeMs = 1;
-  optional string tag = 2;
-  repeated LogEventKeyValues value = 3;
-  optional bytes sourceExtension = 6;
-  optional ActiveExperiments exp = 7;
-}
-
-message LogEventKeyValues {
-  optional string key = 1;
-  optional string value = 2;
-}
-
-message LogResponse {
-  optional int64 nextRequestWaitMillis = 1;
-  optional ExperimentIdList experiments = 2;
-}
-
-message Docid {
-  optional string backendDocid = 1;
-  optional int32 type = 2;
+message DocId {
+  optional string backendDocId = 1;
+  optional int32 type = 2[default = 1];
   optional int32 backend = 3;
 }
 
@@ -444,9 +410,15 @@ message Install {
   optional int32 version = 2;
   optional bool bundled = 3;
   optional bool pending = 4;
+  optional int64 lastUpdated = 5;
 }
 
 message GroupLicenseKey {
+  optional fixed64 dasher_customer_id = 1;
+  optional DocId docId = 2;
+  optional int32 licensed_offer_type = 3 [default = 1];
+  optional int32 type = 4;
+  optional int32 rental_period_days = 5;
 }
 
 message LicenseTerms {
@@ -461,7 +433,7 @@ message Offer {
   optional bool checkoutFlowRequired = 5;
   optional int64 fullPriceMicros = 6;
   optional string formattedFullAmount = 7;
-  optional int32 offerType = 8;
+  optional int32 offerType = 8[default = 1];
   optional RentalTerms rentalTerms = 9;
   optional int64 onSaleDate = 10;
   repeated string promotionLabel = 11;
@@ -471,7 +443,7 @@ message Offer {
   optional int64 saleEndTimestamp = 30;
   optional string saleMessage = 31;
   optional bool preorder = 15;
-  optional int32 onSaleDateDisplayTimeZoneOffsetMsec = 16;
+  optional int32 onSaleDateDisplayTimeZoneOffsetMillis = 16;
   optional int32 licensedOfferType = 17;
   optional SubscriptionContentTerms subscriptionContentTerms = 18;
   optional string offerId = 19;
@@ -525,7 +497,7 @@ message SignedData {
 }
 
 message SubscriptionContentTerms {
-  optional Docid requiredSubscription = 1;
+  optional DocId requiredSubscription = 1;
 }
 
 message GroupLicenseInfo {
@@ -538,19 +510,19 @@ message LicensedDocumentInfo {
 }
 
 message OwnershipInfo {
-  optional int64 initiationtimestamp = 1;
-  optional int64 validUntiltimestamp = 2;
+  optional int64 initiationTimestamp = 1;
+  optional int64 validUntilTimestamp = 2;
   optional bool autoRenewing = 3;
-  optional int64 refundTimeouttimestamp = 4;
-  optional int64 postDeliveryRefundWindowMsec = 5;
+  optional int64 refundTimeoutTimestamp = 4;
+  optional int64 postDeliveryRefundWindowMillis = 5;
   optional SignedData developerPurchaseInfo = 6;
-  optional bool preordered = 7;
+  optional bool preOrdered = 7;
   optional bool hidden = 8;
   optional RentalTerms rentalTerms = 9;
   optional GroupLicenseInfo groupLicenseInfo = 10;
   optional LicensedDocumentInfo licensedDocumentInfo = 11;
   optional int32 quantity = 12;
-  optional int64 libraryExpirationtimestamp = 14;
+  optional int64 libraryExpirationTimestamp = 14;
 }
 
 message SubscriptionTerms {
@@ -681,10 +653,10 @@ message StoredValueInstrument {
 }
 
 message TopupInfo {
-  optional string optionsContainerDocidDeprecated = 1;
+  optional string optionsContainerDocIdDeprecated = 1;
   optional string optionsListUrl = 2;
   optional string subtitle = 3;
-  optional Docid optionsContainerDocid = 4;
+  optional DocId optionsContainerDocId = 4;
 }
 
 message ConsumePurchaseResponse {
@@ -700,6 +672,7 @@ message ContainerMetadata {
   optional string analyticsCookie = 5;
   optional bool ordered = 6;
   repeated ContainerView containerView = 7;
+  optional Image leftIcon = 8;
 }
 
 message ContainerView {
@@ -789,7 +762,7 @@ message DebugSettingsResponse {
 }
 
 message DeliveryResponse {
-  optional int32 status = 1;
+  optional int32 status = 1[default = 1];
   optional AndroidAppDeliveryData appDeliveryData = 2;
 }
 
@@ -798,11 +771,11 @@ message BulkDetailsEntry {
 }
 
 message BulkDetailsRequest {
-  repeated string docid = 1;
-  optional bool includeChildDocs = 2;
+  repeated string DocId = 1;
+  optional bool includeChildDocs = 2[default = true];
   optional bool includeDetails = 3;
   optional string sourcePackageName = 4;
-  repeated int32 installedVersionCode = 5;
+  repeated int32 installedVersionCode = 7;
 }
 
 message BulkDetailsResponse {
@@ -814,37 +787,39 @@ message DetailsResponse {
   optional Review userReview = 3;
   optional Item item = 4;
   optional string footerHtml = 5;
-  repeated Badge badge = 7;
+  optional bytes serverLogsCookie = 6;
+  repeated DiscoveryBadge discoveryBadge = 7;
+  optional bool enableReviews = 8 [default = true];
   optional Features features = 12;
   optional string detailsStreamUrl = 13;
   optional string userReviewUrl = 14;
   optional string postAcquireDetailsStreamUrl = 17;
 }
 
-message Badge {
+message DiscoveryBadge {
   optional string label = 1;
   optional Image image = 2;
   optional int32 backgroundColor = 3;
-  optional BadgeContainer1 badgeContainer1 = 4;
+  optional DiscoveryBadgeLink badgeContainer1 = 4;
   optional bytes serverLogsCookie = 5;
   optional bool isPlusOne = 6;
   optional float aggregateRating = 7;
   optional int32 userStarRating = 8;
   optional string downloadCount = 9;
   optional string downloadUnits = 10;
-  optional string message = 11;
+  optional string contentDescription = 11;
+  optional PlayerBadge playerBadge = 12;
+  optional bytes familyAgeRangeBadge = 13;
+  optional bytes familyCategoryBadge = 14;
 }
 
-message BadgeContainer1 {
-  optional BadgeContainer2 badgeContainer2 = 1;
+message PlayerBadge {
+  optional Image overlayIcon = 1;
 }
 
-message BadgeContainer2 {
-  optional BadgeLinkContainer badgeLinkContainer = 2;
-}
-
-message BadgeLinkContainer {
-  optional string link = 2;
+message DiscoveryBadgeLink {
+  optional Link link = 1;
+  optional string userReviewsUrl = 2;
   optional string criticReviewsUrl = 3;
 }
 
@@ -875,13 +850,17 @@ message DeviceConfigurationProto {
   repeated string systemSupportedLocale = 14;
   repeated string glExtension = 15;
   optional int32 deviceClass = 16;
-  optional int32 maxApkDownloadSizeMb = 17;
+  optional int32 maxApkDownloadSizeMb = 17[default = 50];
+  optional int32 smallestScreenWidthDP = 18;
+  optional bool lowRamDevice = 19;
+  optional int64 totalMemoryBytes = 20;
+  optional int32 maxNumOf_CPUCores = 21;
 }
 
 message Document {
-  optional Docid docid = 1;
-  optional Docid fetchDocid = 2;
-  optional Docid sampleDocid = 3;
+  optional DocId DocId = 1;
+  optional DocId fetchDocId = 2;
+  optional DocId sampleDocId = 3;
   optional string title = 4;
   optional string url = 5;
   repeated string snippet = 6;
@@ -923,6 +902,7 @@ message Image {
   optional group Dimension = 2 {
     optional int32 width = 3;
     optional int32 height = 4;
+    optional int32 aspectRatio = 18;
   }
   optional string imageUrl = 5;
   optional string altTextLocalized = 6;
@@ -934,12 +914,12 @@ message Image {
     optional string url = 12;
   }
   optional int32 durationSeconds = 14;
-  optional string color = 15;
+  optional string fillColorRGB = 15;
   optional bool autogen = 16;
   optional Attribution attribution = 17;
   optional string backgroundColorRgb = 19;
   optional ImagePalette palette = 20;
-  optional int32 screenshotSetNumber = 21;
+  optional int32 deviceClass = 21;
   optional bool supportsFifeMonogramOption = 22;
   optional string imageUrlAlt = 28;
 }
@@ -952,6 +932,12 @@ message Attribution {
 }
 
 message ImagePalette {
+  optional string lightVibrantRGB = 1;
+  optional string vibrantRGB = 2;
+  optional string darkVibrantRGB = 3;
+  optional string lightMutedRGB = 4;
+  optional string mutedRGB = 5;
+  optional string darkMutedRGB = 6;
 }
 
 message TranslatedText {
@@ -991,7 +977,7 @@ message AppDetails {
   repeated FileMetadata file = 17;
   optional string appType = 18;
   repeated string certificateHash = 19;
-  optional bool unstable = 21;
+  optional bool variesByAccount = 21 [default = true];
   repeated CertificateSet certificateSet = 22;
   repeated string autoAcquireFreeAppIfHigherVersionAvailableTag = 23;
   optional bool hasInstantLink = 24;
@@ -999,7 +985,7 @@ message AppDetails {
   optional bool gamepadRequired = 26;
   optional bool externallyHosted = 27;
   optional bool everExternallyHosted = 28;
-  optional string containsAds = 30;
+  optional string installNotes = 30;
   optional int32 installLocation = 31;
   optional int32 targetSdkVersion = 32;
   optional string hasPreregistrationPromoCode = 33;
@@ -1036,6 +1022,7 @@ message EditorChoice{
 
 message CertificateSet {
   repeated string certificateHash = 1;
+  repeated string sha256 = 2;
 }
 
 message Dependencies {
@@ -1108,8 +1095,8 @@ message ListResponse {
 
 message Item {
   optional int32 id = 1;
-  optional int32 type = 3;
   optional int32 category = 2;
+  optional int32 type = 3;
   optional int32 categoryId = 4;
   optional string title = 5;
   optional string creator = 6;
@@ -1121,7 +1108,7 @@ message Item {
   optional ContainerMetadata containerMetadata = 12;
   optional DocumentDetails details = 13;
   optional AggregateRating aggregateRating = 14;
-  optional RelatedLinks relatedLinks = 15;
+  optional Annotations annotations = 15;
   optional string detailsUrl = 16;
   optional string shareUrl = 17;
   optional string reviewsUrl = 18;
@@ -1129,11 +1116,13 @@ message Item {
   optional string purchaseDetailsUrl = 20;
   optional bool detailsReusable = 21;
   optional string subtitle = 22;
-  optional UnknownCategoryContainer unknownCategoryContainer = 24;
+  optional string translatedDescriptionHtml = 23;
+  optional bytes serverLogsCookie = 24;
   optional ProductDetails productDetails = 25;
   optional bool mature = 26;
-  optional string descriptionShort = 27;
-  optional bool availabileForPreregistration = 29;
+  optional string promotionalDescription = 27;
+  optional bool availableForPreregistration = 29;
+  repeated ReviewTip tip = 30;
   optional string reviewSnippetsUrl = 31;
   optional bool forceShareability = 32;
   optional bool useWishlistAsPrimaryAction = 33;
@@ -1156,13 +1145,38 @@ message ProductDetailsDescription {
   optional string description = 2;
 }
 
-message RelatedLinks {
-  repeated ClusterLink clusterLinks = 9;
-  optional RelatedLinksUnknown1 unknown1 = 10;
+message Annotations {
+  optional SectionMetaData sectionRelated = 1;
+  optional SectionMetaData sectionMoreBy = 2;
+  repeated Warning warning = 4;
+  optional SectionMetaData sectionBodyOfWork = 5;
+  optional SectionMetaData sectionCoreContent = 6;
+  repeated Badge badgeForCreator = 8;
+  repeated Badge badgeForItem = 9;
+  optional AnnotationLink annotationLink = 10;
+  optional SectionMetaData sectionCrossSell = 11;
+  optional SectionMetaData sectionRelatedItemType = 12;
+  repeated PromotedDoc promotedDoc = 13;
+  optional string offerNote = 14;
   optional string privacyPolicyUrl = 18;
-  optional RelatedLink youMightAlsoLike = 24;
-  optional Rated rated = 29;
-  repeated RelatedLink relatedLinks = 34;
+  optional SuggestionReasons suggestion_reasons = 19;
+  optional Warning optimalDeviceClassWarning = 20;
+  repeated BadgeContainer badgeContainer = 21;
+  optional SectionMetaData sectionSuggestForRating = 22;
+  optional SectionMetaData sectionPurchaseCrossSell = 24;
+  repeated OverflowLink overflowLink = 25;
+  optional string attributionHtml = 27;
+  optional PurchaseHistoryDetails purchaseHistoryDetails = 28;
+  optional Badge badgeForContentRating = 29;
+  repeated VoucherInfo voucherInfo = 30;
+  optional SectionMetaData sectionFeaturedApps = 32;
+  repeated SectionMetaData detailsPageCluster = 34;
+  optional VideoAnnotations videoAnnotations = 35;
+  optional SectionMetaData sectionPurchaseRelatedTopics = 36;
+  optional MySubscriptionDetails mySubscriptionDetails = 37;
+  optional MyRewardDetails myRewardDetails = 38;
+  repeated Badge featureBadge = 39;
+  optional Snippet snippet = 42;
   optional string downloadsLabel = 48;
   optional CategoryInfo categoryInfo = 53;
   optional string reasons = 60;
@@ -1174,14 +1188,102 @@ message RelatedLinks {
   optional string promotionUrl = 85;
   optional SubStream categoryStream = 97;
 }
-
-message RelatedLinksUnknown1 {
-  optional RelatedLinksUnknown2 unknown2 = 2;
+message SuggestionReasons {
+  repeated Reason reason = 2;
+  optional Dismissal neutralDismissal = 4;
+  optional Dismissal positiveDismissal = 5;
 }
 
-message RelatedLinksUnknown2 {
-  optional string homeUrl = 2;
-  optional string nextPageUrl = 3;
+message Reason {
+  optional string descriptionHtml = 3;
+  optional ReasonPlusOne reasonPlusOne = 4;
+  optional ReasonReview reasonReview = 5;
+  optional Dismissal dismissal = 7;
+  optional ReasonUserAction reasonUserAction = 9;
+}
+
+message ReasonPlusOne {
+  optional string localizedDescriptionHtml = 1;
+  repeated UserProfile userProfile = 3;
+}
+
+message ReasonReview {
+  optional Review review = 1;
+}
+
+message ReasonUserAction {
+  optional UserProfile userProfile = 1;
+  optional string localizedDescriptionHtml = 2;
+}
+
+message Dismissal {
+  optional string url = 1;
+  optional string descriptionHtml = 2;
+}
+
+message Snippet {
+  optional string snippetHtml = 1;
+}
+
+message MyRewardDetails {
+  optional int64 expirationTimeMillis = 1;
+  optional string expirationDescription = 2;
+  optional string buttonLabel = 3;
+  optional Link linkAction = 4;
+}
+
+message MySubscriptionDetails {
+  optional string subscriptionStatusHtml = 1;
+  optional string title = 2;
+  optional string titleByLineHtml = 3;
+  optional string formattedPrice = 4;
+  optional string priceByLineHtml = 5;
+  optional bool cancelSubscription = 6;
+  optional Link paymentDeclinedLearnMoreLink = 7;
+  optional bool inTrialPeriod = 8;
+  optional Image titleByLineIcon = 9;
+}
+
+message VideoAnnotations {
+  optional bool bundle = 1;
+  optional string bundleContentListUrl = 2;
+  optional string extrasContentListUrl = 3;
+  optional string alsoAvailableInListUrl = 4;
+  repeated DocId bundleDocId = 5;
+}
+
+message VoucherInfo {
+  optional Item item = 1;
+  repeated Offer offer = 2;
+}
+
+message BadgeContainer {
+  optional string title = 1;
+  repeated Image image = 2;
+  repeated Badge badge = 3;
+}
+
+message OverflowLink {
+  optional string title = 1;
+  optional Link link = 2;
+}
+
+message PromotedDoc {
+  optional string title = 1;
+  optional string subtitle = 2;
+  repeated Image image = 3;
+  optional string description = 4;
+  optional string detailsUrl = 5;
+}
+
+message Warning {
+  optional string localizedMessage = 1;
+}
+
+message AnnotationLink {
+  optional string uri = 1;
+  optional ResolvedLink resolvedLink = 2;
+  optional int32 uriBackend = 3;
 }
 
 message Rated {
@@ -1190,17 +1292,20 @@ message Rated {
   optional string learnMoreHtmlLink = 4;
 }
 
-message RelatedLink {
-  optional string label = 1;
-  optional string url1 = 2;
-  optional string url2 = 3;
+message SectionMetaData {
+  optional string header = 1;
+  optional string listUrl = 2;
+  optional string browseUrl = 3;
+  optional string description = 4;
 }
 
-message ClusterLink {
-  optional string label = 1;
-  optional Image image = 2;
-  optional string stream = 3;
+message Badge {
+  optional string title = 1;
+  repeated Image image = 2;
+  optional string browseUrl = 3;
   optional string description = 4;
+  optional string textInTitleSection = 5;
+  optional Image expandedBadgeImage = 6;
 }
 
 message BadgeInfo {
@@ -1208,16 +1313,15 @@ message BadgeInfo {
   optional Image image = 2;
   optional string subtitle = 3;
   optional BadgeSubInfo badgeSubInfo = 6;
-  optional Link link = 7;
+  optional StreamLink link = 7;
   optional string description = 8;
   optional SubStream stream = 12;
 }
 
-
 message BadgeSubInfo {
   optional Image image = 1;
   optional string description = 4;
-  optional Link link = 5;
+  optional StreamLink link = 5;
 }
 
 message Stream{
@@ -1227,10 +1331,16 @@ message Stream{
 }
 
 message SubStream{
-  optional Link link = 2;
+  optional StreamLink link = 2;
 }
 
-message Link{
+message Link {
+  optional string uri = 1;
+  optional ResolvedLink resolvedLink = 2;
+  optional int32 uriBackend = 3;
+}
+
+message StreamLink{
   optional string url = 1;
   optional string streamUrl = 2;
   optional string searchUrl = 3;
@@ -1291,7 +1401,7 @@ message Rule {
   repeated string stringArg = 4;
   repeated int64 longArg = 5;
   repeated double doubleArg = 6;
-  repeated Rule subrule = 7;
+  repeated Rule subRule = 7;
   optional int32 responseCode = 8;
   optional string comment = 9;
   repeated fixed64 stringArgHash = 10;
@@ -1310,8 +1420,8 @@ message RuleEvaluation {
 
 message LibraryAppDetails {
   optional string certificateHash = 2;
-  optional int64 refundTimeouttimestamp = 3;
-  optional int64 postDeliveryRefundWindowMsec = 4;
+  optional int64 refundTimeoutTimestamp = 3;
+  optional int64 postDeliveryRefundWindowMillis = 4;
 }
 
 message LibraryInAppDetails {
@@ -1320,7 +1430,7 @@ message LibraryInAppDetails {
 }
 
 message LibraryMutation {
-  optional Docid docid = 1;
+  optional DocId DocId = 1;
   optional int32 offerType = 2;
   optional int64 documentHash = 3;
   optional bool deleted = 4;
@@ -1330,10 +1440,10 @@ message LibraryMutation {
 }
 
 message LibrarySubscriptionDetails {
-  optional int64 initiationtimestamp = 1;
-  optional int64 validUntiltimestamp = 2;
+  optional int64 initiationTimestamp = 1;
+  optional int64 validUntilTimestamp = 2;
   optional bool autoRenewing = 3;
-  optional int64 trialUntiltimestamp = 4;
+  optional int64 trialUntilTimestamp = 4;
   optional string signedPurchaseData = 5;
   optional string signature = 6;
 }
@@ -1365,7 +1475,7 @@ message LibraryDirtyData {
 message Notification {
   optional int32 notificationType = 1;
   optional int64 timestamp = 3;
-  optional Docid docid = 4;
+  optional DocId DocId = 4;
   optional string docTitle = 5;
   optional string userEmail = 6;
   optional AndroidAppNotificationData appData = 7;
@@ -1397,7 +1507,7 @@ message UserNotificationData {
 }
 
 message AggregateRating {
-  optional int32 type = 1;
+  optional int32 type = 1[default = 1];
   optional float starRating = 2;
   optional uint64 ratingsCount = 3;
   optional uint64 oneStarRatings = 4;
@@ -1409,9 +1519,26 @@ message AggregateRating {
   optional uint64 thumbsDownCount = 10;
   optional uint64 commentCount = 11;
   optional double bayesianMeanRating = 12;
+  repeated Tip tip = 13;
   optional string ratingLabel = 17;
   optional string ratingCountLabelAbbreviated = 18;
   optional string ratingCountLabel = 19;
+}
+
+message Tip {
+  optional string tipId = 1;
+  optional string text = 2;
+  optional int32 polarity = 3;
+  optional int64 reviewCount = 4;
+  optional string language = 5;
+  repeated string snippetReviewId = 6;
+}
+
+message ReviewTip {
+  optional string tipUrl = 1;
+  optional string text = 2;
+  optional int32 polarity = 3;
+  optional int64 reviewCount = 4;
 }
 
 message AcceptTosResponse {
@@ -1450,7 +1577,7 @@ message SelfUpdateConfig {
   optional int32 latestClientVersionCode = 1;
 }
 
-message TosResponse {
+message TocResponse {
   repeated CorpusMetadata corpus = 1;
   optional int32 tosVersionDeprecated = 2;
   optional string tosContent = 3;
@@ -1466,7 +1593,7 @@ message TosResponse {
   optional string recsWidgetUrl = 13;
   optional string socialHomeUrl = 15;
   optional bool ageVerificationRequired = 16;
-  optional bool gplusSignupEnabled = 17;
+  optional bool gPlusSignupEnabled = 17;
   optional bool redeemEnabled = 18;
   optional string helpUrl = 19;
   optional int32 themeId = 20;
@@ -1476,6 +1603,13 @@ message TosResponse {
 
 message UserSettings {
   optional bool tosCheckboxMarketingEmailsOptedIn = 1;
+  optional PrivacySetting privacySetting = 2;
+}
+
+message PrivacySetting {
+  optional int32 type = 1;
+  optional int32 currentStatus = 2;
+  optional bool enabledByDefault = 3;
 }
 
 message Payload {
@@ -1484,7 +1618,7 @@ message Payload {
   optional ReviewResponse reviewResponse = 3;
   optional BuyResponse buyResponse = 4;
   optional SearchResponse searchResponse = 5;
-  optional TosResponse tocResponse = 6;
+  optional TocResponse tocResponse = 6;
   optional BrowseResponse browseResponse = 7;
   optional PurchaseStatusResponse purchaseStatusResponse = 8;
   optional string logResponse = 10;
@@ -1518,7 +1652,7 @@ message Payload {
   optional SurveyResponse surveyResponse = 51;
   optional PingResponse pingResponse = 52;
   optional UpdateUserSettingResponse updateUserSettingResponse = 53;
-  optional GetUserSettingsResponse getUserSettingsREsponse = 54;
+  optional GetUserSettingsResponse getUserSettingsResponse = 54;
   optional GetSharingSettingsResponse getSharingSettingsResponse = 56;
   optional UpdateSharingSettingsResponse updateSharingSettingsResponse = 57;
   optional ReviewSnippetsResponse reviewSnippetsResponse = 58;
@@ -1564,6 +1698,17 @@ message EarlyUpdateResponse {
 }
 
 message PreloadsResponse {
+  optional Preload configPreload = 1;
+  message Preload {
+    optional DocId DocId = 1;
+    optional int32 versionCode = 2;
+    optional string title = 3;
+    optional Image icon = 4;
+    optional string deliveryToken = 5;
+    optional int32 installLocation = 6;
+    optional int64 size = 7;
+  }
+  repeated Preload appPreload = 2;
 }
 
 message MyAccountsResponse {
@@ -1657,7 +1802,7 @@ message ServerCommands {
   optional string logErrorStacktrace = 3;
 }
 
-message UserReviewsResponse {
+message GetReviewsResponse {
   repeated Review review = 1;
   optional int64 matchingCount = 2;
 }
@@ -1674,10 +1819,22 @@ message Review {
   optional string commentId = 9;
   optional string deviceName = 19;
   optional string replyText = 29;
-  optional int64 replytimestamp = 30;
+  optional int64 replyTimeStamp = 30;
   optional ReviewAuthor author = 31;
   optional UserProfile userProfile = 33;
   optional Image sentiment = 34;
+  optional int32 helpfulCount = 35;
+  optional int64 thumbsUpCount = 38;
+}
+
+message CriticReviewsResponse {
+  optional string title = 1;
+  optional Image image = 2;
+  optional uint32 totalNumReviews = 3;
+  optional uint32 percentFavorable = 4;
+  optional string sourceText = 5;
+  optional Link source = 6;
+  repeated Review review = 7;
 }
 
 message ReviewAuthor {
@@ -1686,27 +1843,29 @@ message ReviewAuthor {
 }
 
 message UserProfile {
-  optional string personIdString = 1;
+  optional string profileId = 1;
   optional string personId = 2;
-  optional int32 unknown1 = 3;
-  optional int32 unknown2 = 4;
+  optional int32 profileType = 3;
+  optional int32 personType = 4;
   optional string name = 5;
   repeated Image image = 10;
-  optional string googlePlusUrl = 19;
-  optional string googlePlusTagline = 22;
+  optional string profileUrl = 19;
+  optional string profileDescription = 22;
 }
 
 message ReviewResponse {
-  optional UserReviewsResponse userReviewsResponse = 1;
+  optional GetReviewsResponse userReviewsResponse = 1;
   optional string nextPageUrl = 2;
   optional Review userReview = 3;
+  optional string suggestions_list_url = 4;
+  optional CriticReviewsResponse criticReviewsResponse = 5;
 }
 
 message RelatedSearch {
   optional string searchUrl = 1;
   optional string header = 2;
   optional int32 backendId = 3;
-  optional int32 docType = 4;
+  optional int32 docType = 4[default = 1];
   optional bool current = 5;
 }
 
@@ -1717,6 +1876,9 @@ message SearchResponse {
   repeated Bucket bucket = 4;
   repeated Item item = 5;
   repeated RelatedSearch relatedSearch = 6;
+  optional bytes serverLogsCookie = 7;
+  optional bool fullPageReplaced = 8;
+  optional bool containsSnow = 9;
   optional string nextPageUrl = 10;
 }
 
@@ -1954,20 +2116,4 @@ message ModifyLibraryRequest {
   optional string libraryId = 1;
   repeated string addPackageName = 2;
   repeated string removePackageName = 3;
-}
-
-message UrlRequestWrapper {
-  optional DeveloperAppsRequest developerAppsRequest = 49;
-}
-
-message DeveloperAppsRequest {
-  optional DeveloperIdContainer developerIdContainer1 = 1;
-  optional DeveloperIdContainer developerIdContainer2 = 2;
-  optional int32 unknownInt3 = 3;
-}
-
-message DeveloperIdContainer {
-  optional string developerId = 1;
-  optional int32 unknownInt2 = 2;
-  optional int32 unknownInt3 = 3;
 }

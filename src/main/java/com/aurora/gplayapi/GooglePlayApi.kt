@@ -34,7 +34,7 @@ import java.util.*
 class GooglePlayApi(private val authData: AuthData) {
 
     @Throws(IOException::class)
-    fun tos(): TosResponse {
+    fun tos(): TocResponse {
         val responseBody = HttpClient[URL_TOC, getDefaultHeaders(authData)]
         val tocResponse = ResponseWrapper.parseFrom(responseBody?.bytes()).payload.tocResponse
         if (tocResponse.tosContent.isNotBlank() && tocResponse.tosToken.isNotBlank()) {

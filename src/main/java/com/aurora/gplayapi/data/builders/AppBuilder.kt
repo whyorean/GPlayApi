@@ -44,8 +44,8 @@ object AppBuilder {
         app.relatedLinks = HashMap()
         app.displayName = item.title
         app.description = item.descriptionHtml
-        app.shortDescription = item.descriptionShort
-        app.categoryId = item.relatedLinks.categoryInfo.appCategory
+        app.shortDescription = item.promotionalDescription
+        app.categoryId = item.annotations.categoryInfo.appCategory
         app.restriction = Constants.Restriction.forInt(item.availability.restriction)
 
         if (item.offerCount > 0) {
@@ -56,7 +56,6 @@ object AppBuilder {
 
         fillOfferDetails(app, item)
         fillAggregateRating(app, item.aggregateRating)
-        fillRelatedLinks(app, item)
 
         val appDetails = item.details.appDetails
         app.fileMetadataList = appDetails.fileList
@@ -70,11 +69,11 @@ object AppBuilder {
         app.updated = appDetails.uploadDate
         app.changes = appDetails.recentChangesHtml
         app.permissions = appDetails.permissionList
-        app.containsAds = appDetails.containsAds.isNotEmpty()
+        app.containsAds = appDetails.hasInstallNotes()
         app.inPlayStore = true
         app.earlyAccess = appDetails.hasEarlyAccessInfo()
         app.testingProgramAvailable = appDetails.hasTestingProgramInfo()
-        app.labeledRating = item.relatedLinks.rated.label
+        app.labeledRating = item.aggregateRating.ratingLabel
         app.developerName = appDetails.developerName
         app.developerEmail = appDetails.developerEmail
         app.developerAddress = appDetails.developerAddress
@@ -142,17 +141,6 @@ object AppBuilder {
         }
     }
 
-    private fun fillRelatedLinks(app: App, details: Item) {
-        if (!details.hasRelatedLinks()) {
-            return
-        }
-        for (link in details.relatedLinks.relatedLinksList) {
-            if (link.label.isNotEmpty() && link.url1.isNotEmpty()) {
-                app.relatedLinks[link.label] = link.url1
-            }
-        }
-    }
-
     private fun fillImages(app: App, images: List<Image>) {
         for (image in images) {
             when (image.imageType) {
@@ -163,14 +151,6 @@ object AppBuilder {
                 Constants.IMAGE_TYPE_APP_SCREENSHOT -> app.screenshotUrls.add(image.imageUrl)
             }
         }
-    }
-
-    private fun getLink(badge: Badge?): String? {
-        return if (null != badge && badge.hasBadgeContainer1()
-                && badge.badgeContainer1.hasBadgeContainer2()
-                && badge.badgeContainer1.badgeContainer2.hasBadgeLinkContainer()) {
-            badge.badgeContainer1.badgeContainer2.badgeLinkContainer.link
-        } else null
     }
 
     private fun parseSafeLong(string: String): Long {

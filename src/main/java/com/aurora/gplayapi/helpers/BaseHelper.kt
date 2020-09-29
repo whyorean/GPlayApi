@@ -92,7 +92,7 @@ open class BaseHelper(protected var authData: AuthData) {
 
     fun getBulkDetailsBytes(packageList: List<String?>?): ByteArray {
         val bulkDetailsRequestBuilder = BulkDetailsRequest.newBuilder()
-        bulkDetailsRequestBuilder.addAllDocid(packageList)
+        bulkDetailsRequestBuilder.addAllDocId(packageList)
         return bulkDetailsRequestBuilder.build().toByteArray()
     }
 

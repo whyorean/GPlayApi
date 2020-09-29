@@ -25,7 +25,7 @@ class AuthHelper {
 
     companion object {
         fun build(email: String, aasToken: String): AuthData {
-            val properties = DeviceManager.loadProperties("op_5.properties")
+            val properties = DeviceManager.loadProperties("poco_f1.properties")
             val deviceInfoProvider = PropertiesDeviceInfoProvider()
             deviceInfoProvider.setProperties(properties!!)
             deviceInfoProvider.setLocaleString(Locale.getDefault().toString())

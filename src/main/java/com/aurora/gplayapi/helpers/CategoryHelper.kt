@@ -68,8 +68,8 @@ class CategoryHelper(authData: AuthData) : BaseHelper(authData) {
         val category = Category()
         category.title = subItem.title
         category.imageUrl = subItem.getImage(0).imageUrl
-        category.color = subItem.getImage(0).color
-        category.homeUrl = subItem.relatedLinks.unknown1.unknown2.homeUrl
+        category.color = subItem.getImage(0).fillColorRGB
+        category.homeUrl = subItem.annotations.annotationLink.resolvedLink.homeUrl
         category.type = type
         return category
     }

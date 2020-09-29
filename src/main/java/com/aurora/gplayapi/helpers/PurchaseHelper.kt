@@ -36,7 +36,9 @@ class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
         params["vc"] = versionCode.toString()
         val responseBody = HttpClient.post(GooglePlayApi.PURCHASE_URL, HeaderProvider.getDefaultHeaders(authData), params)
         val payload = getPayLoadFromBytes(responseBody?.bytes())
-        return if (payload != null && payload.hasBuyResponse()) payload.buyResponse else null
+        return if (payload!!.hasBuyResponse())
+            payload.buyResponse
+        else null
     }
 
     @Throws(IOException::class)
@@ -44,8 +46,8 @@ class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
                             installedVersionCode: Int = 0,
                             updateVersionCode: Int,
                             offerType: Int,
-                            patchFormats: Array<PATCH_FORMAT?> = arrayOf(PATCH_FORMAT.GDIFF, PATCH_FORMAT.GZIPPED_GDIFF, PATCH_FORMAT.GZIPPED_BSDIFF),
-                            downloadToken: String?): DeliveryResponse? {
+                            patchFormats: Array<PATCH_FORMAT> = arrayOf(PATCH_FORMAT.GDIFF, PATCH_FORMAT.GZIPPED_GDIFF, PATCH_FORMAT.GZIPPED_BSDIFF),
+                            downloadToken: String): DeliveryResponse? {
 
         val params: MutableMap<String, String> = HashMap()
         params["ot"] = offerType.toString()
@@ -53,12 +55,14 @@ class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
         params["vc"] = updateVersionCode.toString()
 
         /*if (installedVersionCode > 0) {
-            params.put("bvc", String.valueOf(installedVersionCode));
-            params.put("pf", String.valueOf(patchFormats[0].value));
+            params["bvc"] = installedVersionCode.toString();
+            params["pf"] = patchFormats[0].value.toString();
         }*/
-        if (null != downloadToken && downloadToken.isNotEmpty()) {
+
+        if (downloadToken.isNotEmpty()) {
             params["dtok"] = downloadToken
         }
+
         val responseBody = HttpClient[GooglePlayApi.DELIVERY_URL, HeaderProvider.getDefaultHeaders(authData), params]
         val payload = ResponseWrapper.parseFrom(responseBody?.bytes()).payload
         return if (payload != null && payload.hasDeliveryResponse()) payload.deliveryResponse else null
@@ -67,7 +71,7 @@ class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
     @Throws(Exception::class)
     fun purchase(packageName: String, versionCode: Int, offerType: Int): List<File> {
         val buyResponse = getBuyResponse(packageName, versionCode, offerType)
-        val downloadToken = buyResponse!!.downloadToken
+        val downloadToken = buyResponse!!.encodedDeliveryToken
         val deliveryResponse = getDeliveryResponse(packageName = packageName,
                 updateVersionCode = versionCode,
                 offerType = offerType,
