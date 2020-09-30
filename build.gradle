@@ -36,7 +36,6 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation "com.google.protobuf:protobuf-javalite:3.8.0"
 
     //Square
     implementation "com.squareup.retrofit2:retrofit:2.8.1"
@@ -64,15 +63,6 @@ clean {
 protobuf {
     protoc {
         artifact = ("com.google.protobuf:protoc:3.8.0")
-    }
-    generateProtoTasks {
-        all().each { task ->
-            task.builtins {
-                java {
-                    option("lite")
-                }
-            }
-        }
     }
 }
 
