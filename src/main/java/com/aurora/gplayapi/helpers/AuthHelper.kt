@@ -18,7 +18,7 @@ package com.aurora.gplayapi.helpers
 import com.aurora.gplayapi.DeviceManager
 import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.data.models.AuthData
-import com.aurora.gplayapi.data.providers.PropertiesDeviceInfoProvider
+import com.aurora.gplayapi.data.providers.DeviceInfoProvider
 import java.util.*
 
 class AuthHelper {
@@ -40,9 +40,7 @@ class AuthHelper {
         }
 
         fun build(email: String, aasToken: String, properties: Properties): AuthData {
-            val deviceInfoProvider = PropertiesDeviceInfoProvider()
-            deviceInfoProvider.setProperties(properties)
-            deviceInfoProvider.setLocaleString(Locale.getDefault().toString())
+            val deviceInfoProvider = DeviceInfoProvider(properties, Locale.getDefault().toString())
 
             val authData = AuthData(email, aasToken)
             authData.deviceInfoProvider = deviceInfoProvider
