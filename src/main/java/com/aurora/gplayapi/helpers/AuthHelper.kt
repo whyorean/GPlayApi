@@ -22,12 +22,26 @@ import com.aurora.gplayapi.data.providers.PropertiesDeviceInfoProvider
 import java.util.*
 
 class AuthHelper {
-
     companion object {
         fun build(email: String, aasToken: String): AuthData {
-            val properties = DeviceManager.loadProperties("poco_f1.properties")
+            val properties = DeviceManager.loadProperties("op_5.properties")
+            if (properties != null)
+                return build(email, aasToken, properties)
+            else
+                throw Exception("Unable to read device config")
+        }
+
+        fun build(email: String, aasToken: String, deviceName: String): AuthData {
+            val properties = DeviceManager.loadProperties(deviceName)
+            if (properties != null)
+                return build(email, aasToken, properties)
+            else
+                throw Exception("Unable to read device config")
+        }
+
+        fun build(email: String, aasToken: String, properties: Properties): AuthData {
             val deviceInfoProvider = PropertiesDeviceInfoProvider()
-            deviceInfoProvider.setProperties(properties!!)
+            deviceInfoProvider.setProperties(properties)
             deviceInfoProvider.setLocaleString(Locale.getDefault().toString())
 
             val authData = AuthData(email, aasToken)
