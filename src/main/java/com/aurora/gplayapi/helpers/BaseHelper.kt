@@ -17,24 +17,20 @@ package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.*
 import com.aurora.gplayapi.data.builders.AppBuilder.build
-import com.aurora.gplayapi.data.models.App
-import com.aurora.gplayapi.data.models.AuthData
-import com.aurora.gplayapi.data.models.StreamBundle
-import com.aurora.gplayapi.data.models.StreamCluster
+import com.aurora.gplayapi.data.models.*
 import com.aurora.gplayapi.data.models.editor.EditorChoiceBundle
 import com.aurora.gplayapi.data.models.editor.EditorChoiceCluster
 import com.aurora.gplayapi.data.models.subcategory.SubCategoryBundle
 import com.aurora.gplayapi.data.models.subcategory.SubCategoryCluster
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.HttpClient
-import okhttp3.ResponseBody
 import java.io.IOException
 import java.util.*
 
 open class BaseHelper(protected var authData: AuthData) {
     @Throws(IOException::class)
-    fun getResponse(url: String, params: Map<String, String>, headers: Map<String, String>): ResponseBody? {
-        return HttpClient[url, headers, params]
+    fun getResponse(url: String, params: Map<String, String>, headers: Map<String, String>): PlayResponse {
+        return HttpClient.get(url, headers, params)
     }
 
     /*-------------------------------------------- COMMONS -------------------------------------------------*/
@@ -47,21 +43,21 @@ open class BaseHelper(protected var authData: AuthData) {
     }
 
     @Throws(Exception::class)
-    fun getPayLoadFromBytes(bytes: ByteArray?): Payload? {
+    fun getPayLoadFromBytes(bytes: ByteArray?): Payload {
         val responseWrapper = ResponseWrapper.parseFrom(bytes)
         return responseWrapper!!.payload
     }
 
     @Throws(Exception::class)
-    fun getDetailsResponseFromBytes(bytes: ByteArray?): DetailsResponse? {
+    fun getDetailsResponseFromBytes(bytes: ByteArray?): DetailsResponse {
         val payload = getPayLoadFromBytes(bytes)
-        return payload!!.detailsResponse
+        return payload.detailsResponse
     }
 
     @Throws(Exception::class)
     fun getListResponseFromBytes(bytes: ByteArray?): ListResponse? {
         val payload = getPayLoadFromBytes(bytes)
-        return payload!!.listResponse
+        return payload.listResponse
     }
 
     @Throws(Exception::class)
@@ -100,7 +96,7 @@ open class BaseHelper(protected var authData: AuthData) {
     @Throws(Exception::class)
     fun getSearchResponseFromBytes(bytes: ByteArray?): SearchResponse? {
         val payload = getPayLoadFromBytes(bytes)
-        return if (payload != null && payload.hasSearchResponse()) {
+        return if (payload.hasSearchResponse()) {
             payload.searchResponse
         } else null
     }
@@ -108,7 +104,7 @@ open class BaseHelper(protected var authData: AuthData) {
     @Throws(Exception::class)
     fun getSearchSuggestResponseFromBytes(bytes: ByteArray?): SearchSuggestResponse? {
         val payload = getPayLoadFromBytes(bytes)
-        return if (payload != null && payload.hasSearchSuggestResponse()) {
+        return if (payload.hasSearchSuggestResponse()) {
             payload.searchSuggestResponse
         } else null
     }
@@ -117,8 +113,8 @@ open class BaseHelper(protected var authData: AuthData) {
     @Throws(Exception::class)
     fun getNextStreamResponse(nextPageUrl: String): ListResponse? {
         val headers: Map<String, String> = getDefaultHeaders(authData)
-        val responseBody = HttpClient[GooglePlayApi.URL_FDFE + "/" + nextPageUrl, headers]
-        return getListResponseFromBytes(responseBody!!.bytes())
+        val playResponse = HttpClient.get(GooglePlayApi.URL_FDFE + "/" + nextPageUrl, headers)
+        return getListResponseFromBytes(playResponse.responseBytes)
     }
 
     @Throws(Exception::class)
@@ -233,8 +229,8 @@ open class BaseHelper(protected var authData: AuthData) {
     @Throws(Exception::class)
     fun getEditorChoiceBrowseResponse(nextPageUrl: String): ListResponse {
         val headers: Map<String, String> = getDefaultHeaders(authData)
-        val responseBody = HttpClient[GooglePlayApi.URL_FDFE + "/" + nextPageUrl, headers]
-        val payload = getPrefetchPayLoad(responseBody!!.bytes())
+        val responseBody = HttpClient.get(GooglePlayApi.URL_FDFE + "/" + nextPageUrl, headers)
+        val payload = getPrefetchPayLoad(responseBody.responseBytes)
         return payload.listResponse
     }
 

@@ -24,7 +24,7 @@ import java.util.*
 class AuthHelper {
     companion object {
         fun build(email: String, aasToken: String): AuthData {
-            val properties = DeviceManager.loadProperties("op_5.properties")
+            val properties = DeviceManager.loadProperties("px_3a.properties")
             if (properties != null)
                 return build(email, aasToken, properties)
             else
@@ -62,7 +62,7 @@ class AuthHelper {
             val token = api.generateToken(aasToken, GooglePlayApi.Service.GOOGLE_PLAY)
             authData.authToken = token
 
-            val tosResponse = api.tos()
+            val tocResponse = api.toc()
             return authData
         }
     }

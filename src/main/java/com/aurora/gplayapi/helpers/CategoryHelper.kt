@@ -37,8 +37,8 @@ class CategoryHelper(authData: AuthData) : BaseHelper(authData) {
         params["c"] = "3"
         params["cat"] = type.value
 
-        val responseBody = HttpClient[GooglePlayApi.CATEGORIES_URL, headers, params]
-        val listResponse = getListResponseFromBytes(responseBody?.bytes())
+        val playResponse = HttpClient.get(GooglePlayApi.CATEGORIES_URL, headers, params)
+        val listResponse = getListResponseFromBytes(playResponse.responseBytes)
 
         if (listResponse!!.itemCount > 0) {
             val item = listResponse.getItem(0)
@@ -57,11 +57,8 @@ class CategoryHelper(authData: AuthData) : BaseHelper(authData) {
     @Throws(Exception::class)
     fun getSubCategoryCluster(homeUrl: String): SubCategoryBundle? {
         val headers = HeaderProvider.getDefaultHeaders(authData)
-        val responseBody = HttpClient[GooglePlayApi.URL_FDFE + "/" + homeUrl, headers]
-        if (responseBody != null) {
-            return getSubCategoryCluster(responseBody.bytes())
-        }
-        return null
+        val playResponse = HttpClient.get(GooglePlayApi.URL_FDFE + "/" + homeUrl, headers)
+        return getSubCategoryCluster(playResponse.responseBytes)
     }
 
     private fun getCategoryFromItem(type: Category.Type, subItem: Item): Category {

@@ -20,6 +20,7 @@ import com.aurora.gplayapi.Constants.PATCH_FORMAT
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.File
 import com.aurora.gplayapi.data.providers.HeaderProvider
+import com.aurora.gplayapi.exceptions.ApiException
 import com.aurora.gplayapi.network.HttpClient
 import java.io.IOException
 import java.util.*
@@ -28,17 +29,15 @@ class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<PurchaseHelper, AuthData>(::PurchaseHelper)
 
-    @Throws(Exception::class)
-    fun getBuyResponse(packageName: String, versionCode: Int, offerType: Int): BuyResponse? {
+    @Throws(IOException::class)
+    fun getBuyResponse(packageName: String, versionCode: Int, offerType: Int): BuyResponse {
         val params: MutableMap<String, String> = HashMap()
         params["ot"] = offerType.toString()
         params["doc"] = packageName
         params["vc"] = versionCode.toString()
-        val responseBody = HttpClient.post(GooglePlayApi.PURCHASE_URL, HeaderProvider.getDefaultHeaders(authData), params)
-        val payload = getPayLoadFromBytes(responseBody?.bytes())
-        return if (payload!!.hasBuyResponse())
-            payload.buyResponse
-        else null
+        val playResponse = HttpClient.post(GooglePlayApi.PURCHASE_URL, HeaderProvider.getDefaultHeaders(authData), params)
+        val payload = getPayLoadFromBytes(playResponse.responseBytes)
+        return payload.buyResponse
     }
 
     @Throws(IOException::class)
@@ -47,7 +46,7 @@ class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
                             updateVersionCode: Int,
                             offerType: Int,
                             patchFormats: Array<PATCH_FORMAT> = arrayOf(PATCH_FORMAT.GDIFF, PATCH_FORMAT.GZIPPED_GDIFF, PATCH_FORMAT.GZIPPED_BSDIFF),
-                            downloadToken: String): DeliveryResponse? {
+                            downloadToken: String): DeliveryResponse {
 
         val params: MutableMap<String, String> = HashMap()
         params["ot"] = offerType.toString()
@@ -63,23 +62,33 @@ class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
             params["dtok"] = downloadToken
         }
 
-        val responseBody = HttpClient[GooglePlayApi.DELIVERY_URL, HeaderProvider.getDefaultHeaders(authData), params]
-        val payload = ResponseWrapper.parseFrom(responseBody?.bytes()).payload
-        return if (payload != null && payload.hasDeliveryResponse()) payload.deliveryResponse else null
+        val playResponse = HttpClient.get(GooglePlayApi.DELIVERY_URL, HeaderProvider.getDefaultHeaders(authData), params)
+        val payload = ResponseWrapper.parseFrom(playResponse.responseBytes).payload
+        return payload.deliveryResponse
     }
 
     @Throws(Exception::class)
     fun purchase(packageName: String, versionCode: Int, offerType: Int): List<File> {
         val buyResponse = getBuyResponse(packageName, versionCode, offerType)
-        val downloadToken = buyResponse!!.encodedDeliveryToken
         val deliveryResponse = getDeliveryResponse(packageName = packageName,
                 updateVersionCode = versionCode,
                 offerType = offerType,
-                downloadToken = downloadToken)
-        return getUrlsFromDeliveryResponse(packageName, deliveryResponse)
+                downloadToken = buyResponse.encodedDeliveryToken)
+
+        when (deliveryResponse.status) {
+            1 ->
+                return getDownloadsFromDeliveryResponse(packageName, deliveryResponse)
+            2 ->
+                throw ApiException.AppNotSupported()
+            3 ->
+                throw ApiException.AppNotPurchased()
+            else ->
+                throw ApiException.Unknown()
+
+        }
     }
 
-    private fun getUrlsFromDeliveryResponse(packageName: String?, deliveryResponse: DeliveryResponse?): List<File> {
+    private fun getDownloadsFromDeliveryResponse(packageName: String?, deliveryResponse: DeliveryResponse?): List<File> {
         val fileList: MutableList<File> = ArrayList()
         if (deliveryResponse != null) {
             //Add base apk

@@ -36,15 +36,15 @@ class ReviewsHelper(authData: AuthData) : BaseHelper(authData) {
     @Throws(Exception::class)
     private fun getReviewResponse(url: String, params: Map<String, String>, headers: Map<String, String>): ReviewResponse? {
         val responseBody = getResponse(url, params, headers)
-        val payload = getPayLoadFromBytes(responseBody!!.bytes())
-        return if (payload != null && payload.hasReviewResponse()) payload.reviewResponse else null
+        val payload = getPayLoadFromBytes(responseBody.responseBytes)
+        return if (payload.hasReviewResponse()) payload.reviewResponse else null
     }
 
     @Throws(Exception::class)
     private fun postReviewResponse(params: Map<String, String>, headers: Map<String, String>): ReviewResponse? {
-        val responseBody = HttpClient.post(GooglePlayApi.URL_REVIEW_ADD_EDIT, headers, params)!!
-        val payload = getPayLoadFromBytes(responseBody.bytes())
-        return if (payload != null && payload.hasReviewResponse()) payload.reviewResponse else null
+        val playResponse = HttpClient.post(GooglePlayApi.URL_REVIEW_ADD_EDIT, headers, params)
+        val payload = getPayLoadFromBytes(playResponse.responseBytes)
+        return if (payload.hasReviewResponse()) payload.reviewResponse else null
     }
 
     private fun getUserReviewsResponse(reviewResponse: ReviewResponse?): GetReviewsResponse? {

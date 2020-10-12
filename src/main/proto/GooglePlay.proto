@@ -997,7 +997,7 @@ message AppDetails {
   optional string developerAddress = 45;
   optional Publisher publisher = 46;
   optional string categoryName = 48;
-  optional string downloadCount = 53;
+  optional int64 downloadCount = 53;
   optional string downloadLabelDisplay = 61;
   optional string downloadLabelAbbreviated = 77;
   optional string downloadLabel = 78;

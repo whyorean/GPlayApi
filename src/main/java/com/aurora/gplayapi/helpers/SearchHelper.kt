@@ -18,16 +18,16 @@ package com.aurora.gplayapi.helpers
 import com.aurora.gplayapi.*
 import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.AuthData
+import com.aurora.gplayapi.data.models.PlayResponse
 import com.aurora.gplayapi.data.models.SearchBundle
 import com.aurora.gplayapi.data.models.SearchBundle.SubBundle
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.HttpClient
-import okhttp3.ResponseBody
 import java.util.*
 
 class SearchHelper(authData: AuthData) : BaseHelper(authData) {
 
-    companion object : SingletonHolder<SearchHelper, AuthData>(::SearchHelper){
+    companion object : SingletonHolder<SearchHelper, AuthData>(::SearchHelper) {
         private const val SEARCH_TYPE_EXTRA = "_-"
         private fun getSubBundle(item: Item): SubBundle {
             var nextPageUrl = String()
@@ -58,10 +58,10 @@ class SearchHelper(authData: AuthData) : BaseHelper(authData) {
         val paramString = String.format("?q=%s&sb=%d&sst=%d&sst=%d",
                 query,
                 5,
-                Constants.SEARCH_SUGGESTION_TYPE.SEARCH_STRING.value,
-                Constants.SEARCH_SUGGESTION_TYPE.APP.value)
+                2 /*Text Entry*/,
+                3 /*Item Doc Id : 3 -> Apps*/)
         val responseBody = HttpClient.getX(GooglePlayApi.URL_SEARCH_SUGGEST, header, paramString)
-        val searchSuggestResponse = getSearchSuggestResponseFromBytes(responseBody!!.bytes())
+        val searchSuggestResponse = getSearchSuggestResponseFromBytes(responseBody.responseBytes)
         return if (searchSuggestResponse != null && searchSuggestResponse.entryCount > 0) {
             searchSuggestResponse.entryList
         } else ArrayList()
@@ -76,13 +76,13 @@ class SearchHelper(authData: AuthData) : BaseHelper(authData) {
         param["c"] = "3"
         param["ksm"] = "1"
 
-        val responseBody: ResponseBody?
+        val responseBody: PlayResponse
         responseBody = if (nextPageUrl!!.isNotBlank()) {
-            HttpClient[GooglePlayApi.URL_SEARCH + "/" + nextPageUrl, header]
+            HttpClient.get(GooglePlayApi.URL_SEARCH + "/" + nextPageUrl, header)
         } else {
-            HttpClient[GooglePlayApi.URL_SEARCH, header, param]
+            HttpClient.get(GooglePlayApi.URL_SEARCH, header, param)
         }
-        val payload = getPrefetchPayLoad(responseBody?.bytes())
+        val payload = getPrefetchPayLoad(responseBody.responseBytes)
         if (payload.hasListResponse()) {
             val searchBundle = getSearchBundle(payload.listResponse)
             bundleSet.addAll(searchBundle.subBundles)

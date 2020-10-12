@@ -39,8 +39,8 @@ class StreamHelper(authData: AuthData) : BaseHelper(authData) {
         } else {
             params["cat"] = category!!.value
         }
-        val responseBody = HttpClient[GooglePlayApi.URL_FDFE + "/" + type.value, headers, params]
-        return getListResponseFromBytes(responseBody!!.bytes())
+        val playResponse = HttpClient.get(GooglePlayApi.URL_FDFE + "/" + type.value, headers, params)
+        return getListResponseFromBytes(playResponse.responseBytes)
     }
 
     @Throws(Exception::class)
@@ -49,8 +49,8 @@ class StreamHelper(authData: AuthData) : BaseHelper(authData) {
         val params: MutableMap<String, String> = HashMap()
         params["n"] = "15"
         params["tab"] = type.value
-        val responseBody = HttpClient[GooglePlayApi.URL_FDFE + "/myAppsStream", headers, params]
-        val listResponse = getListResponseFromBytes(responseBody!!.bytes())
+        val responseBody = HttpClient.get(GooglePlayApi.URL_FDFE + "/myAppsStream", headers, params)
+        val listResponse = getListResponseFromBytes(responseBody.responseBytes)
         return getStreamCluster(listResponse)
     }
 

@@ -34,9 +34,9 @@ import java.util.*
 class GooglePlayApi(private val authData: AuthData) {
 
     @Throws(IOException::class)
-    fun tos(): TocResponse {
-        val responseBody = HttpClient[URL_TOC, getDefaultHeaders(authData)]
-        val tocResponse = ResponseWrapper.parseFrom(responseBody?.bytes()).payload.tocResponse
+    fun toc(): TocResponse {
+        val playResponse = HttpClient.get(URL_TOC, getDefaultHeaders(authData))
+        val tocResponse = ResponseWrapper.parseFrom(playResponse.responseBytes).payload.tocResponse
         if (tocResponse.tosContent.isNotBlank() && tocResponse.tosToken.isNotBlank()) {
             acceptTos(tocResponse.tosToken)
         }
@@ -53,8 +53,8 @@ class GooglePlayApi(private val authData: AuthData) {
         params["tost"] = tosToken
         params["toscme"] = "false"
 
-        val responseBody = HttpClient.post(URL_TOS_ACCEPT, headers, params)!!
-        return ResponseWrapper.parseFrom(responseBody.bytes())
+        val playResponse = HttpClient.post(URL_TOS_ACCEPT, headers, params)
+        return ResponseWrapper.parseFrom(playResponse.responseBytes)
                 .payload
                 .acceptTosResponse
     }
@@ -75,11 +75,11 @@ class GooglePlayApi(private val authData: AuthData) {
                 .url(URL_UPLOAD_DEVICE_CONFIG)
                 .post(RequestBody.create(MediaType.parse("application/x-protobuf"), request.toByteArray()))
 
-        val responseBody = requestBuilder.build().body()?.let {
+        val playResponse = requestBuilder.build().body()?.let {
             HttpClient.post(URL_UPLOAD_DEVICE_CONFIG, headers, it)
         }
 
-        val configResponse = ResponseWrapper.parseFrom(responseBody?.bytes())
+        val configResponse = ResponseWrapper.parseFrom(playResponse?.responseBytes)
                 .payload
                 .uploadDeviceConfigResponse
 
@@ -110,7 +110,7 @@ class GooglePlayApi(private val authData: AuthData) {
         val responseBody = requestBuilder.build().body()?.let {
             HttpClient.post(URL_CHECK_IN, headers, it)
         }
-        return AndroidCheckinResponse.parseFrom(responseBody?.bytes())
+        return AndroidCheckinResponse.parseFrom(responseBody?.responseBytes)
     }
 
     @Throws(IOException::class)
@@ -120,8 +120,8 @@ class GooglePlayApi(private val authData: AuthData) {
         params.putAll(getAASTokenHeaders(email, oauthToken))
         val headers: MutableMap<String, String> = getAuthHeaders(authData)
         headers["app"] = "com.android.vending"
-        val responseBody = HttpClient.post(URL_AUTH, headers, params)
-        val hashMap = Util.parseResponse(responseBody?.string())
+        val playResponse = HttpClient.post(URL_AUTH, headers, params)
+        val hashMap = Util.parseResponse(playResponse.responseBytes)
         return if (hashMap.containsKey("Token")) {
             hashMap["Token"]
         } else {
@@ -170,8 +170,8 @@ class GooglePlayApi(private val authData: AuthData) {
             }
         }
 
-        val responseBody = HttpClient.post(URL_AUTH, headers, params)
-        val hashMap = Util.parseResponse(responseBody?.string())
+        val playResponse = HttpClient.post(URL_AUTH, headers, params)
+        val hashMap = Util.parseResponse(playResponse.responseBytes)
 
         return if (hashMap.containsKey("Auth")) {
             val token = hashMap["Auth"]

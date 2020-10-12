@@ -21,9 +21,9 @@ import java.util.*;
 
 public class Util {
 
-    public static Map<String, String> parseResponse(String response) {
-        final Map<String, String> keyValueMap = new HashMap<String, String>();
-        final StringTokenizer stringTokenizer = new StringTokenizer(response, "\n\r");
+    public static Map<String, String> parseResponse(byte[] response) {
+        final Map<String, String> keyValueMap = new HashMap<>();
+        final StringTokenizer stringTokenizer = new StringTokenizer(new String(response), "\n\r");
         while (stringTokenizer.hasMoreTokens()) {
             final String[] keyValue = stringTokenizer.nextToken().split("=", 2);
             if (keyValue.length >= 2) {

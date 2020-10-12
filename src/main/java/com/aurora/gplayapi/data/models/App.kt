@@ -38,7 +38,7 @@ class App {
     var downloadString: String? = null
     var footerHtml: String? = null
     var iconUrl: String? = null
-    var pageBackgroungUrl: String? = null
+    var pageBackgroundUrl: String? = null
     var instantAppLink: String? = null
     var labeledRating: String? = null
     var packageName: String? = null
@@ -58,7 +58,7 @@ class App {
     var testingProgramOptedIn = false
     var offerType = 0
     var versionCode = 0
-    var installs: String = String()
+    var installs: Long = 0
     var size: Long = 0
     var rating: Rating? = null
     var restriction: Restriction? = null

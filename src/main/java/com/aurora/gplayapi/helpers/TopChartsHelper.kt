@@ -35,8 +35,8 @@ class TopChartsHelper(authData: AuthData) : BaseHelper(authData) {
         params["stcid"] = chart.value
         params["scat"] = type.value
 
-        val responseBody = HttpClient[GooglePlayApi.TOP_CHART_URL, headers, params]
-        val listResponse = getListResponseFromBytes(responseBody?.bytes())
+        val playResponse = HttpClient.get(GooglePlayApi.TOP_CHART_URL, headers, params)
+        val listResponse = getListResponseFromBytes(playResponse.responseBytes)
         return getStreamCluster(listResponse)
     }
 

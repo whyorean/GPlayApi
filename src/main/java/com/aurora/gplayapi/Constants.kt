@@ -16,10 +16,7 @@
 package com.aurora.gplayapi
 
 object Constants {
-    const val AVAILABILITY_NOT_RESTRICTED = 1
-    const val AVAILABILITY_RESTRICTED_GEO = 2
-    const val AVAILABILITY_REMOVED = 7
-    const val AVAILABILITY_INCOMPATIBLE_DEVICE_APP = 9
+
     const val IMAGE_TYPE_APP_SCREENSHOT = 1
     const val IMAGE_TYPE_PLAY_STORE_PAGE_BACKGROUND = 2
     const val IMAGE_TYPE_YOUTUBE_VIDEO_LINK = 3
@@ -28,46 +25,37 @@ object Constants {
     const val IMAGE_TYPE_GOOGLE_PLUS_BACKGROUND = 15
 
     enum class ABUSE(var value: Int) {
-        SEXUAL_CONTENT(1), GRAPHIC_VIOLENCE(3), HATEFUL_OR_ABUSIVE_CONTENT(4), IMPROPER_CONTENT_RATING(5), HARMFUL_TO_DEVICE_OR_DATA(7), OTHER(8), ILLEGAL_PRESCRIPTION(11), IMPERSONATION(12);
+        SEXUAL_CONTENT(1),
+        GRAPHIC_VIOLENCE(3),
+        HATEFUL_OR_ABUSIVE_CONTENT(4),
+        IMPROPER_CONTENT_RATING(5),
+        HARMFUL_TO_DEVICE_OR_DATA(7),
+        OTHER(8), ILLEGAL_PRESCRIPTION(11),
+        IMPERSONATION(12);
     }
 
     enum class PATCH_FORMAT(var value: Int) {
-        GDIFF(1), GZIPPED_GDIFF(2), GZIPPED_BSDIFF(3), UNKNOWN_4(4), UNKNOWN_5(5);
-    }
-
-    enum class REVIEW_SORT(var value: Int) {
-        NEWEST(0), HIGH_RATING(1), HELPFUL(4);
-    }
-
-    enum class RECOMMENDATION_TYPE(var value: Int) {
-        ALSO_VIEWED(1), ALSO_INSTALLED(2);
-    }
-
-    enum class SEARCH_SUGGESTION_TYPE(var value: Int) {
-        SEARCH_STRING(2), APP(3);
-    }
-
-    enum class SUBCATEGORY(var value: String) {
-        TOP_FREE("apps_topselling_free"), TOP_GROSSING("apps_topgrossing"), MOVERS_SHAKERS("apps_movers_shakers");
-    }
-
-    enum class LIBRARY_ID(var value: String) {
-        WISH_LIST("u-wl");
-    }
-
-    enum class APP_STREAM_TAB {
-        INSTALLED, UPDATES, LIBRARY
+        GDIFF(1),
+        GZIPPED_GDIFF(2),
+        GZIPPED_BSDIFF(3),
+        UNKNOWN_4(4),
+        UNKNOWN_5(5);
     }
 
     enum class Restriction(val restriction: Int) {
-        GENERIC(-1), NOT_RESTRICTED(AVAILABILITY_NOT_RESTRICTED), RESTRICTED_GEO(AVAILABILITY_RESTRICTED_GEO), INCOMPATIBLE_DEVICE(AVAILABILITY_INCOMPATIBLE_DEVICE_APP);
+        GENERIC(-1),
+        NOT_RESTRICTED(1),
+        GEO_RESTRICTED(2),
+        DEVICE_RESTRICTED(7),
+        UNKNOWN(9);
 
         companion object {
             fun forInt(restriction: Int): Restriction {
                 return when (restriction) {
-                    AVAILABILITY_NOT_RESTRICTED -> NOT_RESTRICTED
-                    AVAILABILITY_RESTRICTED_GEO -> RESTRICTED_GEO
-                    AVAILABILITY_INCOMPATIBLE_DEVICE_APP -> INCOMPATIBLE_DEVICE
+                    1 -> NOT_RESTRICTED
+                    2 -> GEO_RESTRICTED
+                    7 -> DEVICE_RESTRICTED
+                    9 -> UNKNOWN
                     else -> GENERIC
                 }
             }

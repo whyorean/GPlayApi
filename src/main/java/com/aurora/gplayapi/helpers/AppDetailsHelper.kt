@@ -21,6 +21,7 @@ import com.aurora.gplayapi.data.builders.AppBuilder
 import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
+import com.aurora.gplayapi.exceptions.ApiException
 import com.aurora.gplayapi.network.HttpClient
 import okhttp3.MediaType
 import okhttp3.Request
@@ -37,12 +38,14 @@ class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
         val params: MutableMap<String, String> = HashMap()
         params["doc"] = packageName
 
-        val responseBody = HttpClient[GooglePlayApi.URL_DETAILS, headers, params]
+        val playResponse = HttpClient.get(GooglePlayApi.URL_DETAILS, headers, params)
 
-        return if (responseBody != null) {
-            val detailsResponse = getDetailsResponseFromBytes(responseBody.bytes())
-            AppBuilder.build(detailsResponse!!.item)
-        } else null
+        if (playResponse.isSuccessful) {
+            val detailsResponse = getDetailsResponseFromBytes(playResponse.responseBytes)
+            return AppBuilder.build(detailsResponse.item)
+        } else {
+            throw ApiException.AppNotFound(playResponse.errorString)
+        }
     }
 
     @Throws(Exception::class)
@@ -59,19 +62,23 @@ class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
                 .url(GooglePlayApi.URL_BULK_DETAILS)
                 .post(RequestBody.create(MediaType.parse("application/x-protobuf"), request))
 
-
-        val responseBody = requestBuilder.build().body()?.let {
+        val playResponse = requestBuilder.build().body()?.let {
             HttpClient.post(GooglePlayApi.URL_BULK_DETAILS, headers, it)
         }
 
-        val payload = getPayLoadFromBytes(responseBody?.bytes())
-
-        if (payload != null && payload.hasBulkDetailsResponse()) {
-            val bulkDetailsResponse = payload.bulkDetailsResponse
-            for (entry in bulkDetailsResponse.entryList) {
-                appList.add(AppBuilder.build(entry.item))
-            }
-        }
-        return appList
+        if (playResponse != null) {
+            if (playResponse.isSuccessful) {
+                val payload = getPayLoadFromBytes(playResponse.responseBytes)
+                if (payload.hasBulkDetailsResponse()) {
+                    val bulkDetailsResponse = payload.bulkDetailsResponse
+                    for (entry in bulkDetailsResponse.entryList) {
+                        appList.add(AppBuilder.build(entry.item))
+                    }
+                }
+                return appList
+            } else
+                throw ApiException.Server(playResponse.errorString)
+        } else
+            throw ApiException.Unknown()
     }
 }

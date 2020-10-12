@@ -32,7 +32,7 @@ class MyAppsHelper(authData: AuthData) : BaseHelper(authData) {
         get() {
             val headers: Map<String, String> = getDefaultHeaders(authData)
             val params: Map<String, String> = HashMap()
-            val responseBody = HttpClient[GooglePlayApi.URL_MY_APPS, headers, params]
-            return getListResponseFromBytes(responseBody!!.bytes())
+            val playResponse = HttpClient.get(GooglePlayApi.URL_MY_APPS, headers, params)
+            return getListResponseFromBytes(playResponse.responseBytes)
         }
 }

@@ -20,7 +20,6 @@ import com.aurora.gplayapi.data.builders.ReviewBuilder.build
 import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.Rating
 import java.util.*
-import java.util.regex.Pattern
 
 object AppBuilder {
 
@@ -96,13 +95,6 @@ object AppBuilder {
         return app
     }
 
-    private fun getInstallsNum(installsRaw: String): Long {
-        val matcher = Pattern.compile("[\\d]+").matcher(installsRaw.replace("[,.\\s]+".toRegex(), ""))
-        return if (matcher.find()) {
-            parseSafeLong(matcher.group(0))
-        } else 0
-    }
-
     private fun fillAggregateRating(app: App, aggregateRating: AggregateRating) {
         val rating = Rating(
                 aggregateRating.starRating,
@@ -147,7 +139,7 @@ object AppBuilder {
                 Constants.IMAGE_TYPE_CATEGORY_ICON -> app.categoryIconUrl = image.imageUrl
                 Constants.IMAGE_TYPE_APP_ICON -> app.iconUrl = image.imageUrl
                 Constants.IMAGE_TYPE_YOUTUBE_VIDEO_LINK -> app.videoUrl = image.imageUrl
-                Constants.IMAGE_TYPE_PLAY_STORE_PAGE_BACKGROUND -> app.pageBackgroungUrl = image.imageUrl
+                Constants.IMAGE_TYPE_PLAY_STORE_PAGE_BACKGROUND -> app.pageBackgroundUrl = image.imageUrl
                 Constants.IMAGE_TYPE_APP_SCREENSHOT -> app.screenshotUrls.add(image.imageUrl)
             }
         }

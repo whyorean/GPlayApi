@@ -34,8 +34,8 @@ class BrowseHelper(authData: AuthData) : BaseHelper(authData) {
         val params: MutableMap<String, String> = HashMap()
         params["c"] = "3"
         params["cat"] = if (type == Type.GAME) "GAME" else "APPLICATION"
-        val responseBody = HttpClient[GooglePlayApi.TOP_CHART_URL, headers, params]
-        val responseWrapper = ResponseWrapper.parseFrom(responseBody!!.bytes())
+        val responseBody = HttpClient.get(GooglePlayApi.TOP_CHART_URL, headers, params)
+        val responseWrapper = ResponseWrapper.parseFrom(responseBody.responseBytes)
         val payload = responseWrapper.payload
     }
 

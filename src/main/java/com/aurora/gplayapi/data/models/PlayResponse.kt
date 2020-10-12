@@ -13,22 +13,12 @@
  *     GNU General Public License for more details.
  */
 
-package com.aurora.gplayapi
+package com.aurora.gplayapi.data.models
 
-open class SingletonHolder<out T, in A>(private val constructor: (A) -> T) {
-
-    @Volatile
-    private var instance: T? = null
-
-    fun with(arg: A): T {
-        return when {
-            instance != null -> instance!!
-            else -> synchronized(this) {
-                if (instance == null) {
-                    instance = constructor(arg)
-                }
-                instance!!
-            }
-        }
-    }
+class PlayResponse {
+    var responseBytes: ByteArray = byteArrayOf()
+    var errorBytes: ByteArray = byteArrayOf()
+    var errorString: String = ("Unknown Error")
+    var isSuccessful: Boolean = false
+    var code: Int = 0
 }
