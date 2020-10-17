@@ -19,7 +19,7 @@ import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.ListResponse
 import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.models.AuthData
-import com.aurora.gplayapi.data.models.StreamCluster
+import com.aurora.gplayapi.data.models.StreamBundle
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.HttpClient
 import java.util.*
@@ -29,7 +29,19 @@ class StreamHelper(authData: AuthData) : BaseHelper(authData) {
     companion object : SingletonHolder<StreamHelper, AuthData>(::StreamHelper)
 
     @Throws(Exception::class)
-    fun getList(type: Type, category: Category?): ListResponse? {
+    fun getNavStream(type: Type, category: Category): StreamBundle {
+        val listResponse = getListResponse(type, category)
+        return getStreamBundle(listResponse)
+    }
+
+    @Throws(Exception::class)
+    fun next(nextPageUrl: String): StreamBundle {
+        val listResponse = getNextStreamResponse(nextPageUrl)
+        return getStreamBundle(listResponse)
+    }
+
+    @Throws(Exception::class)
+    fun getListResponse(type: Type, category: Category): ListResponse {
         val headers: MutableMap<String, String> = getDefaultHeaders(authData)
         val params: MutableMap<String, String> = HashMap()
         params["c"] = "3"
@@ -37,26 +49,22 @@ class StreamHelper(authData: AuthData) : BaseHelper(authData) {
         if (type == Type.EARLY_ACCESS) {
             params["ct"] = "1"
         } else {
-            params["cat"] = category!!.value
+            if (category != Category.NONE)
+                params["cat"] = category.value
         }
-        val playResponse = HttpClient.get(GooglePlayApi.URL_FDFE + "/" + type.value, headers, params)
-        return getListResponseFromBytes(playResponse.responseBytes)
-    }
 
-    @Throws(Exception::class)
-    fun getMyAppsStream(type: StreamType): StreamCluster? {
-        val headers: MutableMap<String, String> = getDefaultHeaders(authData)
-        val params: MutableMap<String, String> = HashMap()
-        params["n"] = "15"
-        params["tab"] = type.value
-        val responseBody = HttpClient.get(GooglePlayApi.URL_FDFE + "/myAppsStream", headers, params)
-        val listResponse = getListResponseFromBytes(responseBody.responseBytes)
-        return getStreamCluster(listResponse)
+        val playResponse = HttpClient.get(GooglePlayApi.URL_FDFE + "/" + type.value, headers, params)
+
+        return if (playResponse.isSuccessful)
+            getListResponseFromBytes(playResponse.responseBytes)
+        else
+            ListResponse.getDefaultInstance()
     }
 
     enum class Category(var value: String) {
         APPLICATION("APPLICATION"),
-        GAME("GAME");
+        GAME("GAME"),
+        NONE("NONE");
     }
 
     enum class Type(var value: String) {
@@ -67,11 +75,5 @@ class StreamHelper(authData: AuthData) : BaseHelper(authData) {
         PREMIUM_GAMES("getAppsPremiumGameStream"),
         SUB_NAV("subnavHome"),
         TOP_CHART("topChartsStream");
-    }
-
-    enum class StreamType(var value: String) {
-        MY_APPS_INSTALLED("INSTALLED"),
-        MY_APPS_LIBRARY("LIBRARY"),
-        MY_APPS_UPDATES("UPDATES");
     }
 }

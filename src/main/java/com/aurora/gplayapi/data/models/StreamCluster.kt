@@ -21,4 +21,8 @@ class StreamCluster {
     var nextPageUrl: String = String()
     var browseUrl: String = String()
     var appList: List<App> = ArrayList()
+
+    fun hasNext(): Boolean {
+        return nextPageUrl.isNotBlank()
+    }
 }

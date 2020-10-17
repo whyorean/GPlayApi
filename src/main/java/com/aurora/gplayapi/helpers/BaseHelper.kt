@@ -55,7 +55,7 @@ open class BaseHelper(protected var authData: AuthData) {
     }
 
     @Throws(Exception::class)
-    fun getListResponseFromBytes(bytes: ByteArray?): ListResponse? {
+    fun getListResponseFromBytes(bytes: ByteArray?): ListResponse {
         val payload = getPayLoadFromBytes(bytes)
         return payload.listResponse
     }
@@ -111,14 +111,17 @@ open class BaseHelper(protected var authData: AuthData) {
 
     /*--------------------------------------- GENERIC APP STREAMS --------------------------------------------*/
     @Throws(Exception::class)
-    fun getNextStreamResponse(nextPageUrl: String): ListResponse? {
+    fun getNextStreamResponse(nextPageUrl: String): ListResponse {
         val headers: Map<String, String> = getDefaultHeaders(authData)
         val playResponse = HttpClient.get(GooglePlayApi.URL_FDFE + "/" + nextPageUrl, headers)
-        return getListResponseFromBytes(playResponse.responseBytes)
+        return if (playResponse.isSuccessful)
+            getListResponseFromBytes(playResponse.responseBytes)
+        else
+            ListResponse.getDefaultInstance()
     }
 
     @Throws(Exception::class)
-    fun getNextStreamCluster(nextPageUrl: String): StreamCluster? {
+    fun getNextStreamCluster(nextPageUrl: String): StreamCluster {
         val listResponse = getNextStreamResponse(nextPageUrl)
         return getStreamCluster(listResponse)
     }
@@ -135,19 +138,21 @@ open class BaseHelper(protected var authData: AuthData) {
         return streamCluster
     }
 
-    fun getStreamCluster(payload: Payload): StreamCluster? {
-        return if (payload.hasListResponse()) getStreamCluster(payload.listResponse) else null
+    fun getStreamCluster(payload: Payload): StreamCluster {
+        return if (payload.hasListResponse())
+            getStreamCluster(payload.listResponse)
+        else StreamCluster()
     }
 
-    fun getStreamCluster(listResponse: ListResponse?): StreamCluster? {
-        if (listResponse!!.itemCount > 0) {
+    fun getStreamCluster(listResponse: ListResponse): StreamCluster {
+        if (listResponse.itemCount > 0) {
             val item = listResponse.getItem(0)
             if (item != null && item.subItemCount > 0) {
                 val subItem = item.getSubItem(0)
                 return getStreamCluster(subItem)
             }
         }
-        return null
+        return StreamCluster()
     }
 
     fun getStreamClusters(listResponse: ListResponse): List<StreamCluster> {
@@ -266,10 +271,10 @@ open class BaseHelper(protected var authData: AuthData) {
         for (subItem in item.subItemList) {
             choiceClusters.add(getEditorChoiceCluster(subItem))
         }
-        val editorChoiceBundle = EditorChoiceBundle()
-        editorChoiceBundle.title = title
-        editorChoiceBundle.choiceClusters = choiceClusters
-        return editorChoiceBundle
+        return EditorChoiceBundle(
+                title = title,
+                choiceClusters = choiceClusters
+        )
     }
 
     fun getEditorChoiceBundles(listResponse: ListResponse?): List<EditorChoiceBundle> {
@@ -279,7 +284,10 @@ open class BaseHelper(protected var authData: AuthData) {
             if (item != null) {
                 if (item.subItemCount > 0) {
                     for (subItem in item.subItemList) {
-                        editorChoiceBundles.add(getEditorChoiceBundles(subItem))
+                        val bundle = getEditorChoiceBundles(subItem)
+                        if (bundle.choiceClusters.isNotEmpty()) {
+                            editorChoiceBundles.add(bundle)
+                        }
                     }
                 }
             }

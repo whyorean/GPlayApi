@@ -15,8 +15,17 @@
 
 package com.aurora.gplayapi.data.models
 
-class StreamBundle (
-    val title: String = String(),
-    val nextPageUrl: String = String(),
-    val streamClusters: List<StreamCluster> = ArrayList()
-)
+class StreamBundle(
+        val title: String = String(),
+        val nextPageUrl: String = String(),
+        val streamClusters: List<StreamCluster> = ArrayList()
+
+) {
+    operator fun hasNext(): Boolean {
+        return nextPageUrl.isNotBlank()
+    }
+
+    fun hasCluster(): Boolean {
+        return streamClusters.isNotEmpty()
+    }
+}
