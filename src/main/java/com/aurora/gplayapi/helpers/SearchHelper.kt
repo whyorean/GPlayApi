@@ -16,10 +16,7 @@
 package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.*
-import com.aurora.gplayapi.data.models.App
-import com.aurora.gplayapi.data.models.AuthData
-import com.aurora.gplayapi.data.models.PlayResponse
-import com.aurora.gplayapi.data.models.SearchBundle
+import com.aurora.gplayapi.data.models.*
 import com.aurora.gplayapi.data.models.SearchBundle.SubBundle
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.HttpClient
@@ -65,6 +62,17 @@ class SearchHelper(authData: AuthData) : BaseHelper(authData) {
         return if (searchSuggestResponse != null && searchSuggestResponse.entryCount > 0) {
             searchSuggestResponse.entryList
         } else ArrayList()
+    }
+
+    @Throws(Exception::class)
+    fun searchSuggestions2(query: String): List<SearchSuggestion> {
+        val searchSuggestions = searchSuggestions(query)
+        return searchSuggestions.map {
+            SearchSuggestion(
+                    type = it.type,
+                    title = it.title
+            )
+        }.toList()
     }
 
     @Throws(Exception::class)
