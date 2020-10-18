@@ -19,7 +19,7 @@ import com.aurora.gplayapi.Constants.Restriction
 import com.aurora.gplayapi.Features
 import com.aurora.gplayapi.FileMetadata
 
-class App {
+class App(var packageName: String) {
     var screenshotUrls: MutableList<String> = ArrayList()
     var permissions: MutableList<String> = ArrayList()
     var offerDetails: MutableMap<String, String> = HashMap()
@@ -41,7 +41,6 @@ class App {
     var pageBackgroundUrl: String? = null
     var instantAppLink: String? = null
     var labeledRating: String? = null
-    var packageName: String? = null
     var price: String? = null
     var shortDescription: String? = null
     var testingProgramEmail: String? = null

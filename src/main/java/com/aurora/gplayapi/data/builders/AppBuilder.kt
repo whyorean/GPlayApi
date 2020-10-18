@@ -35,7 +35,9 @@ object AppBuilder {
     }
 
     fun build(item: Item): App {
-        val app = App()
+        val appDetails = item.details.appDetails
+        val app = App(appDetails.packageName)
+
         app.screenshotUrls = ArrayList()
         app.permissions = ArrayList()
         app.dependencies = HashSet()
@@ -56,7 +58,6 @@ object AppBuilder {
         fillOfferDetails(app, item)
         fillAggregateRating(app, item.aggregateRating)
 
-        val appDetails = item.details.appDetails
         app.fileMetadataList = appDetails.fileList
         app.packageName = appDetails.packageName
         app.versionName = appDetails.versionString
@@ -142,14 +143,6 @@ object AppBuilder {
                 Constants.IMAGE_TYPE_PLAY_STORE_PAGE_BACKGROUND -> app.pageBackgroundUrl = image.imageUrl
                 Constants.IMAGE_TYPE_APP_SCREENSHOT -> app.screenshotUrls.add(image.imageUrl)
             }
-        }
-    }
-
-    private fun parseSafeLong(string: String): Long {
-        return try {
-            string.toLong()
-        } catch (e: NumberFormatException) {
-            0L
         }
     }
 }
