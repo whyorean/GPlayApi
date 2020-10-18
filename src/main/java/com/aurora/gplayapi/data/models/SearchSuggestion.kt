@@ -17,5 +17,6 @@ package com.aurora.gplayapi.data.models
 
 data class SearchSuggestion(
         var type:Int,
-        var title:String
+        var title:String,
+        var packageName:String
 )

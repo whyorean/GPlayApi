@@ -70,7 +70,8 @@ class SearchHelper(authData: AuthData) : BaseHelper(authData) {
         return searchSuggestions.map {
             SearchSuggestion(
                     type = it.type,
-                    title = it.title
+                    title = it.title,
+                    packageName = it.packageNameContainer.packageName
             )
         }.toList()
     }
