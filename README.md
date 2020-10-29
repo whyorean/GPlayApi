@@ -74,6 +74,22 @@ Use one of the following tools
 	    appList = helper.next()  
 	}
 
+### App Reviews
+
+    var helper = ReviewsHelper.with(authData)
+    var reviews: List<Review?> = helper.getReviews(packageName, filter) //filter = ALL, POSITIVE, CRITICAL
+    while (reviews.size >= ReviewsHelper.DEFAULT_SIZE) {
+        reviews = helper.next(packageName, filter)
+    }
+
+### User Reviews
+
+    val helper = ReviewsHelper(authData)
+    //Submit new review
+    val review = helper.addOrEditReview(packageName, title, content, rating, isBeta)
+    //Retrive review
+    val review = helper.getUserReview(packageName, isBeta)
+
 ## Credits
 1. [googleplay-api](https://github.com/egirault/googleplay-api)
 2. [google-play-crawler](https://github.com/Akdeniz/google-play-crawler)
