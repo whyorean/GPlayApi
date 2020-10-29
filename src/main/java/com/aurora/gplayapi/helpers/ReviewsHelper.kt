@@ -29,8 +29,8 @@ import java.util.*
 class ReviewsHelper(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<ReviewsHelper, AuthData>(::ReviewsHelper) {
-        var offset = 1
-        val DEFAULT_SIZE = 20
+        const val DEFAULT_SIZE = 20
+        var OFFSET = 0
     }
 
     @Throws(Exception::class)
@@ -52,7 +52,7 @@ class ReviewsHelper(authData: AuthData) : BaseHelper(authData) {
     }
 
     @Throws(Exception::class)
-    fun getReviews(packageName: String, filter: Review.Filter, offset: Int, resultNum: Int): List<Review> {
+    fun getReviews(packageName: String, filter: Review.Filter, offset: Int = OFFSET, resultNum: Int = DEFAULT_SIZE): List<Review> {
         val params: MutableMap<String, String> = HashMap()
         params["doc"] = packageName
         params["o"] = offset.toString()
@@ -114,6 +114,6 @@ class ReviewsHelper(authData: AuthData) : BaseHelper(authData) {
 
     @Throws(Exception::class)
     fun next(packageName: String, filter: Review.Filter): List<Review> {
-        return getReviews(packageName, filter, ++offset * DEFAULT_SIZE, DEFAULT_SIZE)
+        return getReviews(packageName, filter, ++OFFSET * DEFAULT_SIZE, DEFAULT_SIZE)
     }
 }
