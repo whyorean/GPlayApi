@@ -84,8 +84,8 @@ Use one of the following tools
 
 ### User Reviews
 
-    val helper = ReviewsHelper(authData)
-    //Submit new review
+    var helper = ReviewsHelper.with(authData)
+    //Submit or Edit review
     val review = helper.addOrEditReview(packageName, title, content, rating, isBeta)
     //Retrive review
     val review = helper.getUserReview(packageName, isBeta)
