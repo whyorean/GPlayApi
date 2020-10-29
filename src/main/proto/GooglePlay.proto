@@ -852,9 +852,17 @@ message DeviceConfigurationProto {
   optional int32 deviceClass = 16;
   optional int32 maxApkDownloadSizeMb = 17[default = 50];
   optional int32 smallestScreenWidthDP = 18;
-  optional bool lowRamDevice = 19;
-  optional int64 totalMemoryBytes = 20;
-  optional int32 maxNumOf_CPUCores = 21;
+  optional int32 lowRamDevice = 19[default=0];
+  optional int64 totalMemoryBytes = 20[default=8354971648];
+  optional int32 maxNumOf_CPUCores = 21[default=8];
+  repeated DeviceFeature deviceFeature = 26;
+  optional int32 unknown28 = 28[default=0];
+  optional int32 unknown30 = 30[default=4];
+}
+
+message DeviceFeature{
+  optional string name = 1;
+  optional int32 value = 2;
 }
 
 message Document {
@@ -1936,7 +1944,7 @@ message UploadDeviceConfigResponse {
 
 message AndroidCheckinRequest {
   optional string imei = 1;
-  optional int64 id = 2;
+  optional int64 id = 2[default=0];
   optional string digest = 3;
   optional AndroidCheckinProto checkin = 4;
   optional string desiredBuild = 5;

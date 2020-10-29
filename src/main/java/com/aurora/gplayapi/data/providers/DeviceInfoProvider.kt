@@ -15,10 +15,7 @@
 
 package com.aurora.gplayapi.data.providers
 
-import com.aurora.gplayapi.AndroidBuildProto
-import com.aurora.gplayapi.AndroidCheckinProto
-import com.aurora.gplayapi.AndroidCheckinRequest
-import com.aurora.gplayapi.DeviceConfigurationProto
+import com.aurora.gplayapi.*
 import java.util.*
 
 class DeviceInfoProvider(var properties: Properties, var localeString: String) : BaseDeviceInfoProvider() {
@@ -37,23 +34,22 @@ class DeviceInfoProvider(var properties: Properties, var localeString: String) :
 
     override val userAgentString: String
         get() {
-            val platforms = StringBuilder()
-            for (platform in getList("Platforms")) {
-                platforms.append(";").append(platform)
-            }
-            return ("Android-Finsky/" + properties.getProperty("Vending.versionString") + " ("
-                    + "api=3"
-                    + ",versionCode=" + properties.getProperty("Vending.version")
-                    + ",sdk=" + properties.getProperty("Build.VERSION.SDK_INT")
-                    + ",device=" + properties.getProperty("Build.DEVICE")
-                    + ",hardware=" + properties.getProperty("Build.HARDWARE")
-                    + ",product=" + properties.getProperty("Build.PRODUCT")
-                    + ",platformVersionRelease=" + properties.getProperty("Build.VERSION.RELEASE")
-                    + ",model=" + properties.getProperty("Build.MODEL")
-                    + ",buildId=" + properties.getProperty("Build.ID")
-                    + ",isWideScreen=0"
-                    + ",supportedAbis=" + platforms.toString().substring(1)
-                    + ")")
+            val platforms = getList("Platforms").joinToString(separator = ";")
+
+            val params = mutableListOf<String>()
+            params.add("api=${3}")
+            params.add("versionCode=${properties.getProperty("Vending.version")}")
+            params.add("sdk=${properties.getProperty("Build.VERSION.SDK_INT")}")
+            params.add("device=${properties.getProperty("Build.DEVICE")}")
+            params.add("hardware=${properties.getProperty("Build.HARDWARE")}")
+            params.add("product=${properties.getProperty("Build.PRODUCT")}")
+            params.add("platformVersionRelease=${properties.getProperty("Build.VERSION.RELEASE")}")
+            params.add("model=${properties.getProperty("Build.MODEL")}")
+            params.add("buildId=${properties.getProperty("Build.ID")}")
+            params.add("isWideScreen=${0}")
+            params.add("supportedAbis=${platforms}")
+
+            return "Android-Finsky/${properties.getProperty("Vending.versionString")} (${params.joinToString(separator = ",")})"
         }
 
     override fun generateAndroidCheckInRequest(): AndroidCheckinRequest? {
@@ -98,8 +94,12 @@ class DeviceInfoProvider(var properties: Properties, var localeString: String) :
                 .setKeyboard(getInt("Keyboard"))
                 .setNavigation(getInt("Navigation"))
                 .setScreenLayout(getInt("ScreenLayout"))
-                .setHasHardKeyboard(java.lang.Boolean.getBoolean(properties.getProperty("HasHardKeyboard")))
-                .setHasFiveWayNavigation(java.lang.Boolean.getBoolean(properties.getProperty("HasFiveWayNavigation")))
+                .setHasHardKeyboard(properties.getProperty("HasHardKeyboard").toBoolean())
+                .setHasFiveWayNavigation(properties.getProperty("HasFiveWayNavigation").toBoolean())
+                .setLowRamDevice(properties.getProperty("LowRamDevice", "0").toInt())
+                .setMaxNumOfCPUCores(properties.getProperty("MaxNumOfCPUCores", "8").toInt())
+                .setTotalMemoryBytes(properties.getProperty("TotalMemoryBytes", "8589935000").toLong())
+                .setDeviceClass(0)
                 .setScreenDensity(getInt("Screen.Density"))
                 .setScreenWidth(getInt("Screen.Width"))
                 .setScreenHeight(getInt("Screen.Height"))
@@ -109,6 +109,7 @@ class DeviceInfoProvider(var properties: Properties, var localeString: String) :
                 .addAllSystemSupportedLocale(getList("Locales"))
                 .setGlEsVersion(getInt("GL.Version"))
                 .addAllGlExtension(getList("GL.Extensions"))
+                .addAllDeviceFeature(getDeviceFeatures())
                 .build()
 
     private fun getInt(key: String): Int {
@@ -123,6 +124,15 @@ class DeviceInfoProvider(var properties: Properties, var localeString: String) :
         return listOf(*properties.getProperty(key).split(",".toRegex()).toTypedArray())
     }
 
+    private fun getDeviceFeatures(): List<DeviceFeature> {
+        return getList("Features").map {
+            DeviceFeature.newBuilder()
+                    .setName(it)
+                    .setValue(0)
+                    .build()
+        }
+    }
+
     private fun ensureCompatibility(properties: Properties) {
         if (!properties.containsKey("Vending.versionString") && properties.containsKey("Vending.version")) {
             var vendingVersionString = "7.1.15"
@@ -134,7 +144,7 @@ class DeviceInfoProvider(var properties: Properties, var localeString: String) :
         if (properties.containsKey("Build.FINGERPRINT") && (!properties.containsKey("Build.ID")
                         || !properties.containsKey("Build.VERSION.RELEASE"))) {
             val fingerprint = properties.getProperty("Build.FINGERPRINT").split("/".toRegex()).toTypedArray()
-            var buildId: String = ""
+            var buildId = ""
             var release = ""
 
             if (fingerprint.size > 5) {
