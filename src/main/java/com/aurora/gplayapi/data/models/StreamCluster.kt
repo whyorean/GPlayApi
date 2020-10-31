@@ -15,7 +15,10 @@
 
 package com.aurora.gplayapi.data.models
 
-class StreamCluster {
+import java.util.*
+import kotlin.collections.ArrayList
+
+data class StreamCluster(val id: String = UUID.randomUUID().toString()) {
     var title: String = String()
     var subtitle: String = String()
     var nextPageUrl: String = String()

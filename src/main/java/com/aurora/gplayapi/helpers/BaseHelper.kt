@@ -180,7 +180,11 @@ open class BaseHelper(protected var authData: AuthData) {
                 nextPageUrl = getNextPageUrl(item)
             }
         }
-        return StreamBundle("", nextPageUrl, streamClusters)
+        val streamBundle = StreamBundle()
+        streamBundle.title = ""
+        streamBundle.nextPageUrl = nextPageUrl
+        streamBundle.streamClusters = streamClusters
+        return streamBundle
     }
 
     /*------------------------------------- SUBCATEGORY STREAMS & BUNDLES ------------------------------------*/
