@@ -72,7 +72,7 @@ open class BaseHelper(protected var authData: AuthData) {
         } else payload
     }
 
-    fun getAppsFromItem(item: Item): List<App> {
+    fun getAppsFromItem(item: Item): MutableList<App> {
         val appList: MutableList<App> = ArrayList()
         if (item.subItemCount > 0) {
             for (subItem in item.subItemList) {
