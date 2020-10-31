@@ -20,7 +20,7 @@ class StreamCluster {
     var subtitle: String = String()
     var nextPageUrl: String = String()
     var browseUrl: String = String()
-    var appList: List<App> = ArrayList()
+    var appList: MutableList<App> = ArrayList()
 
     fun hasNext(): Boolean {
         return nextPageUrl.isNotBlank()

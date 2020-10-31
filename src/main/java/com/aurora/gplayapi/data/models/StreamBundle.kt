@@ -18,8 +18,7 @@ package com.aurora.gplayapi.data.models
 class StreamBundle(
         val title: String = String(),
         val nextPageUrl: String = String(),
-        val streamClusters: List<StreamCluster> = ArrayList()
-
+        val streamClusters: MutableList<StreamCluster> = ArrayList()
 ) {
     operator fun hasNext(): Boolean {
         return nextPageUrl.isNotBlank()
