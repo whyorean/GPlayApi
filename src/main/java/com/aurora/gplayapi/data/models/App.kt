@@ -71,4 +71,15 @@ class App(var packageName: String) {
     @Transient
     var fileMetadataList: List<FileMetadata> = ArrayList()
     var fileList: List<File> = ArrayList()
+
+    override fun hashCode(): Int {
+        return packageName.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return when (other) {
+            is App -> packageName == other.packageName
+            else -> false
+        }
+    }
 }
