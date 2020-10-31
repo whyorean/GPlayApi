@@ -22,7 +22,18 @@ class Category {
     var color: String = String()
     var type: Type = Type.APPLICATION
 
-    enum class Type(val value:String) {
+    enum class Type(val value: String) {
         GAME("GAME"), APPLICATION("APPLICATION");
+    }
+
+    override fun hashCode(): Int {
+        return title.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return when (other) {
+            is Category -> title == other.title
+            else -> false
+        }
     }
 }
