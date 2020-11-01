@@ -18,4 +18,15 @@ package com.aurora.gplayapi.data.models.editor
 data class EditorImage(
         var type: Int = 0,
         var url: String = String(),
-)
+) {
+    override fun hashCode(): Int {
+        return url.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return when (other) {
+            is EditorImage -> other.url == url
+            else -> false
+        }
+    }
+}
