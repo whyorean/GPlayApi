@@ -243,7 +243,12 @@ open class BaseHelper(protected var authData: AuthData) {
         return payload.listResponse
     }
 
-    fun getEditorChoiceApps(listResponse: ListResponse?): List<App> {
+    fun getEditorChoiceApps(browseUrl: String): List<App> {
+        val listResponse = getEditorChoiceBrowseResponse(browseUrl)
+        return getEditorChoiceApps(listResponse)
+    }
+
+    private fun getEditorChoiceApps(listResponse: ListResponse?): List<App> {
         val appList: MutableList<App> = ArrayList()
         if (listResponse != null && listResponse.itemCount > 0) {
             val item = listResponse.getItem(0)

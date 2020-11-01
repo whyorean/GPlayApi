@@ -20,6 +20,7 @@ import com.aurora.gplayapi.ListResponse
 import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.StreamBundle
+import com.aurora.gplayapi.data.models.editor.EditorChoiceBundle
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.HttpClient
 import java.util.*
@@ -32,6 +33,11 @@ class StreamHelper(authData: AuthData) : BaseHelper(authData) {
     fun getNavStream(type: Type, category: Category): StreamBundle {
         val listResponse = getListResponse(type, category)
         return getStreamBundle(listResponse)
+    }
+
+    fun getEditorChoiceStream(category: Category): List<EditorChoiceBundle> {
+        val listResponse = getListResponse(Type.EDITOR_CHOICE, category)
+        return getEditorChoiceBundles(listResponse)
     }
 
     @Throws(Exception::class)

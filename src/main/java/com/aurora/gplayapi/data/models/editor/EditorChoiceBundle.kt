@@ -15,7 +15,11 @@
 
 package com.aurora.gplayapi.data.models.editor
 
-data class EditorChoiceBundle (
-    var title: String = String(),
-    var choiceClusters: List<EditorChoiceCluster> = ArrayList()
+import java.util.*
+import kotlin.collections.ArrayList
+
+data class EditorChoiceBundle(
+        val id: String = UUID.randomUUID().toString(),
+        var title: String = String(),
+        var choiceClusters: List<EditorChoiceCluster> = ArrayList()
 )
