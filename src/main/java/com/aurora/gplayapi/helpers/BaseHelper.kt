@@ -20,6 +20,7 @@ import com.aurora.gplayapi.data.builders.AppBuilder.build
 import com.aurora.gplayapi.data.models.*
 import com.aurora.gplayapi.data.models.editor.EditorChoiceBundle
 import com.aurora.gplayapi.data.models.editor.EditorChoiceCluster
+import com.aurora.gplayapi.data.models.editor.EditorImage
 import com.aurora.gplayapi.data.models.subcategory.SubCategoryBundle
 import com.aurora.gplayapi.data.models.subcategory.SubCategoryCluster
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
@@ -265,8 +266,15 @@ open class BaseHelper(protected var authData: AuthData) {
 
     fun getEditorChoiceCluster(item: Item): EditorChoiceCluster {
         val title = if (item.hasTitle()) item.title else String()
-        val imageList: MutableList<Image> = ArrayList()
-        if (item.imageCount > 0) imageList.addAll(item.imageList)
+        val imageList: MutableList<EditorImage> = ArrayList()
+        if (item.imageCount > 0) {
+            item.imageList.forEach {
+                imageList.add(EditorImage(
+                        it.imageType,
+                        it.imageUrl
+                ))
+            }
+        }
         val editorChoiceCluster = EditorChoiceCluster()
         editorChoiceCluster.title = title
         editorChoiceCluster.browseUrl = getBrowseUrl(item)
