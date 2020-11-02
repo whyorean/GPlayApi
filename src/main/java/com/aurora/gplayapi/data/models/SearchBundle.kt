@@ -27,5 +27,16 @@ data class SearchBundle(val id: String = UUID.randomUUID().toString()) {
         GENERIC, SIMILAR, RELATED_SEARCHES, RELATED_TO_YOUR_SEARCH, YOU_MIGHT_ALSO_LIKE, BOGUS
     }
 
-    class SubBundle(var nextPageUrl: String, var type: Type)
+    class SubBundle(var nextPageUrl: String, var type: Type) {
+        override fun hashCode(): Int {
+            return nextPageUrl.hashCode()
+        }
+
+        override fun equals(other: Any?): Boolean {
+            return when (other) {
+                is SubBundle -> nextPageUrl == other.nextPageUrl
+                else -> false
+            }
+        }
+    }
 }
