@@ -77,7 +77,7 @@ class SearchHelper(authData: AuthData) : BaseHelper(authData) {
     }
 
     @Throws(Exception::class)
-    fun searchResults(query: String, nextPageUrl: String?): List<App> {
+    fun searchResults(query: String, nextPageUrl: String = ""): List<App> {
         this.query = query
         val header: MutableMap<String, String> = getDefaultHeaders(authData)
         val param: MutableMap<String, String> = HashMap()
@@ -86,16 +86,23 @@ class SearchHelper(authData: AuthData) : BaseHelper(authData) {
         param["ksm"] = "1"
 
         val responseBody: PlayResponse
-        responseBody = if (nextPageUrl!!.isNotBlank()) {
+        responseBody = if (nextPageUrl.isNotEmpty()) {
             HttpClient.get(GooglePlayApi.URL_SEARCH + "/" + nextPageUrl, header)
         } else {
             HttpClient.get(GooglePlayApi.URL_SEARCH, header, param)
         }
-        val payload = getPrefetchPayLoad(responseBody.responseBytes)
-        if (payload.hasListResponse()) {
-            val searchBundle = getSearchBundle(payload.listResponse)
-            bundleSet.addAll(searchBundle.subBundles)
-            return searchBundle.appList
+
+        if (responseBody.isSuccessful) {
+            val payload = getPrefetchPayLoad(responseBody.responseBytes)
+            if (payload.hasListResponse()) {
+                val searchBundle = getSearchBundle(payload.listResponse)
+                searchBundle.subBundles
+                        .filter { it.type == SearchBundle.Type.GENERIC }
+                        .forEach {
+                            bundleSet.add(it)
+                        }
+                return searchBundle.appList
+            }
         }
         return ArrayList()
     }
@@ -124,20 +131,15 @@ class SearchHelper(authData: AuthData) : BaseHelper(authData) {
         val appList: MutableList<App> = ArrayList()
         val itemList = listResponse.itemList
         for (item in itemList) {
-            if (item.title.isEmpty()) {
-                if (item.subItemCount > 0) {
-                    for (subItem in item.subItemList) {
-                        //Sublist with non-empty title are useless data (Similar apps, Apps you may also like)
-                        if (subItem.title.isEmpty()) {
-                            //Filter out only apps, discard other items (Music, Ebooks, Movies)
-                            if (subItem.type == 45) {
-                                appList.addAll(getAppsFromItem(subItem))
-                            }
-                        }
-                        searchBundle.subBundles.add(getSubBundle(subItem))
+            if (item.subItemCount > 0) {
+                for (subItem in item.subItemList) {
+                    //Filter out only apps, discard other items (Music, Ebooks, Movies)
+                    if (subItem.type == 45) {
+                        appList.addAll(getAppsFromItem(subItem))
                     }
-                    searchBundle.subBundles.add(getSubBundle(item))
+                    searchBundle.subBundles.add(getSubBundle(subItem))
                 }
+                searchBundle.subBundles.add(getSubBundle(item))
             }
         }
         searchBundle.appList = appList
