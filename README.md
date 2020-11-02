@@ -69,9 +69,10 @@ Use one of the following tools
 ### Search Apps & Games
 
     var helper = SearchHelper.with(authData)
-    var appList = helper.searchResults(query, null)  
-	while (helper.hasNext()) { 
-	    appList = helper.next()  
+    var searchBundle = helper.searchResults(query) 
+    var appList = searchBundle.appList 
+	while (true) { 
+	    appList = helper.next(searchBundle.subBundles)  
 	}
 
 ### App Reviews

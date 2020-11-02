@@ -26,10 +26,10 @@ class SearchHelper(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<SearchHelper, AuthData>(::SearchHelper) {
         private const val SEARCH_TYPE_EXTRA = "_-"
+
         private fun getSubBundle(item: Item): SubBundle {
-            var nextPageUrl = String()
             try {
-                nextPageUrl = item.containerMetadata.nextPageUrl
+                val nextPageUrl = item.containerMetadata.nextPageUrl
                 if (nextPageUrl.isNotBlank()) {
                     if (nextPageUrl.contains(SEARCH_TYPE_EXTRA)) {
                         if (nextPageUrl.startsWith("getCluster?enpt=CkC"))
@@ -42,11 +42,10 @@ class SearchHelper(authData: AuthData) : BaseHelper(authData) {
                 }
             } catch (ignored: Exception) {
             }
-            return SubBundle(nextPageUrl, SearchBundle.Type.BOGUS)
+            return SubBundle("", SearchBundle.Type.BOGUS)
         }
     }
 
-    private val bundleSet: MutableSet<SubBundle> = HashSet()
     private var query: String = String()
 
     @Throws(Exception::class)
@@ -77,7 +76,7 @@ class SearchHelper(authData: AuthData) : BaseHelper(authData) {
     }
 
     @Throws(Exception::class)
-    fun searchResults(query: String, nextPageUrl: String = ""): List<App> {
+    fun searchResults(query: String, nextPageUrl: String = ""): SearchBundle {
         this.query = query
         val header: MutableMap<String, String> = getDefaultHeaders(authData)
         val param: MutableMap<String, String> = HashMap()
@@ -92,38 +91,33 @@ class SearchHelper(authData: AuthData) : BaseHelper(authData) {
             HttpClient.get(GooglePlayApi.URL_SEARCH, header, param)
         }
 
+        var searchBundle = SearchBundle()
+
         if (responseBody.isSuccessful) {
             val payload = getPrefetchPayLoad(responseBody.responseBytes)
             if (payload.hasListResponse()) {
-                val searchBundle = getSearchBundle(payload.listResponse)
-                searchBundle.subBundles
+                searchBundle = getSearchBundle(payload.listResponse)
+                searchBundle.subBundles = searchBundle.subBundles
                         .filter { it.type == SearchBundle.Type.GENERIC }
-                        .forEach {
-                            bundleSet.add(it)
-                        }
-                return searchBundle.appList
+                        .toMutableSet()
+                return searchBundle
             }
         }
-        return ArrayList()
+
+        return searchBundle
     }
 
     @Throws(Exception::class)
-    operator fun next(): List<App> {
-        val appList: MutableList<App> = ArrayList()
-        val iterator: Iterator<SubBundle> = bundleSet.iterator()
-        val subBundle = iterator.next()
-        val nextPageUrl = subBundle.nextPageUrl
-        //Process only generic type
-        if (nextPageUrl.isNotEmpty() && subBundle.type === SearchBundle.Type.GENERIC) {
-            appList.addAll(searchResults(query, nextPageUrl))
-        }
-        //Remove currentNextPageUrl
-        bundleSet.remove(subBundle)
-        return appList
-    }
+    fun next(bundleSet: MutableSet<SubBundle>): SearchBundle {
+        val compositeSearchBundle = SearchBundle()
 
-    operator fun hasNext(): Boolean {
-        return bundleSet.size > 0
+        bundleSet.forEach {
+            val searchBundle = searchResults(query, it.nextPageUrl)
+            compositeSearchBundle.appList.addAll(searchBundle.appList)
+            compositeSearchBundle.subBundles.addAll(searchBundle.subBundles)
+        }
+
+        return compositeSearchBundle
     }
 
     private fun getSearchBundle(listResponse: ListResponse): SearchBundle {
