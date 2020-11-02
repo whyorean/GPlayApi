@@ -23,6 +23,7 @@ buildscript {
 }
 
 plugins {
+    id("java-library")
     id("com.google.protobuf") version("0.8.12")
     id("org.jetbrains.kotlin.jvm") version("1.4.10")
 }
@@ -37,10 +38,11 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
+    //Protobuf
+    implementation "com.google.protobuf:protobuf-java:3.10.0"
+
     //Square
     implementation "com.squareup.retrofit2:retrofit:2.8.1"
-    implementation "com.squareup.retrofit2:converter-protobuf:2.8.1"
-    implementation "com.squareup.retrofit2:converter-scalars:2.8.1"
 }
 
 sourceSets {
@@ -62,8 +64,6 @@ clean {
 
 protobuf {
     protoc {
-        artifact = ("com.google.protobuf:protoc:3.8.0")
+        artifact = ("com.google.protobuf:protoc:3.10.0")
     }
 }
-
-

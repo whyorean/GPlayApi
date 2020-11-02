@@ -75,6 +75,8 @@ object AppBuilder {
         app.testingProgramAvailable = appDetails.hasTestingProgramInfo()
         app.labeledRating = item.aggregateRating.ratingLabel
         app.developerName = appDetails.developerName
+        if (item.creator.isNotEmpty())
+            app.developerName = item.creator
         app.developerEmail = appDetails.developerEmail
         app.developerAddress = appDetails.developerAddress
         app.developerWebsite = appDetails.developerWebsite
