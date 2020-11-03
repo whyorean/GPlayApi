@@ -17,17 +17,30 @@ package com.aurora.gplayapi.network
 
 import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.data.models.PlayResponse
+import okhttp3.Cache
+import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.create
+import java.io.File
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 object HttpClient {
 
+    private val okHttpClient: OkHttpClient = OkHttpClient().newBuilder()
+            .connectTimeout(20, TimeUnit.SECONDS)
+            .cache(Cache(File("okhttp_cache"), 50 * 1024 * 1024L))
+            .retryOnConnectionFailure(true)
+            .followRedirects(true)
+            .followSslRedirects(true)
+            .build()
+
     private val retrofit: Retrofit = Retrofit.Builder()
             .baseUrl(GooglePlayApi.URL_BASE)
+            .client(okHttpClient)
             .build()
 
     private val HTTP_SERVICE: HttpService

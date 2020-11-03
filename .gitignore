@@ -6,3 +6,4 @@ gradle-app.setting
 /request.*
 /local.properties
 /src/main/java/com/aurora/gplayapi/tests/*
+okhttp_cache/
