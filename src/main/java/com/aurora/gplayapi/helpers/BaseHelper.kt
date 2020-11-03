@@ -62,6 +62,12 @@ open class BaseHelper(protected var authData: AuthData) {
     }
 
     @Throws(Exception::class)
+    fun getBrowseResponseFromBytes(bytes: ByteArray?): BrowseResponse {
+        val payload = getPayLoadFromBytes(bytes)
+        return payload.browseResponse
+    }
+
+    @Throws(Exception::class)
     fun getPrefetchPayLoad(bytes: ByteArray?): Payload {
         val responseWrapper = ResponseWrapper.parseFrom(bytes)
         val payload = responseWrapper.payload
@@ -119,6 +125,16 @@ open class BaseHelper(protected var authData: AuthData) {
             getListResponseFromBytes(playResponse.responseBytes)
         else
             ListResponse.getDefaultInstance()
+    }
+
+    @Throws(Exception::class)
+    fun getBrowseStreamResponse(browseUrl: String): BrowseResponse {
+        val headers: Map<String, String> = getDefaultHeaders(authData)
+        val playResponse = HttpClient.get(GooglePlayApi.URL_FDFE + "/" + browseUrl, headers)
+        return if (playResponse.isSuccessful)
+            getBrowseResponseFromBytes(playResponse.responseBytes)
+        else
+            BrowseResponse.getDefaultInstance()
     }
 
     @Throws(Exception::class)
