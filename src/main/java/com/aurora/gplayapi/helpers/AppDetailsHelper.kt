@@ -72,7 +72,9 @@ class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
                 if (payload.hasBulkDetailsResponse()) {
                     val bulkDetailsResponse = payload.bulkDetailsResponse
                     for (entry in bulkDetailsResponse.entryList) {
-                        appList.add(AppBuilder.build(entry.item))
+                        val app = AppBuilder.build(entry.item)
+                        //System.out.printf("%s -> %s\n", app.displayName, app.packageName);
+                        appList.add(app)
                     }
                 }
                 return appList

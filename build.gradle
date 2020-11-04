@@ -43,6 +43,9 @@ dependencies {
 
     //Square
     implementation "com.squareup.retrofit2:retrofit:2.8.1"
+
+    //Gson
+    implementation 'com.google.code.gson:gson:2.8.6'
 }
 
 sourceSets {

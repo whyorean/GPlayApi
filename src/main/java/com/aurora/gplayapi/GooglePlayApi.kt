@@ -215,5 +215,8 @@ class GooglePlayApi(private val authData: AuthData) {
         const val URL_TOC = "$URL_FDFE/toc"
         const val URL_TOS_ACCEPT = "$URL_FDFE/acceptTos"
         const val URL_UPLOAD_DEVICE_CONFIG = "$URL_FDFE/uploadDeviceConfig"
+
+        //Not part of Google's API
+        const val SALES_URL = "https://www.bestappsale.com/api/android/getsale.php"
     }
 }
