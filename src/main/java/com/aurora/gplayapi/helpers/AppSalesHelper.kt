@@ -25,7 +25,7 @@ import com.google.gson.Gson
 import java.io.IOException
 import java.util.*
 
-class AppSalesHelper(authData: AuthData) : BaseHelper(authData) {
+class AppSalesHelper private constructor(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<AppSalesHelper, AuthData>(::AppSalesHelper)
 

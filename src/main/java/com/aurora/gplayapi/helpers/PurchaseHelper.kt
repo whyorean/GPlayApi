@@ -25,7 +25,7 @@ import com.aurora.gplayapi.network.HttpClient
 import java.io.IOException
 import java.util.*
 
-class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
+class PurchaseHelper private constructor(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<PurchaseHelper, AuthData>(::PurchaseHelper)
 

@@ -23,7 +23,7 @@ import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.HttpClient
 import java.util.*
 
-class ClusterHelper(authData: AuthData) : BaseHelper(authData) {
+class ClusterHelper private constructor(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<ClusterHelper, AuthData>(::ClusterHelper)
 

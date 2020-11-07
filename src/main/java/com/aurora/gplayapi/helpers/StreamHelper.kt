@@ -25,7 +25,7 @@ import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.HttpClient
 import java.util.*
 
-class StreamHelper(authData: AuthData) : BaseHelper(authData) {
+class StreamHelper private constructor(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<StreamHelper, AuthData>(::StreamHelper)
 

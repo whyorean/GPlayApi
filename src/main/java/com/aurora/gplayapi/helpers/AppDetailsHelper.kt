@@ -28,7 +28,7 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import java.util.*
 
-class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
+class AppDetailsHelper private constructor(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<AppDetailsHelper, AuthData>(::AppDetailsHelper)
 

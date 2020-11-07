@@ -23,7 +23,7 @@ import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.HttpClient
 import java.util.*
 
-class TopChartsHelper(authData: AuthData) : BaseHelper(authData) {
+class TopChartsHelper private constructor(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<TopChartsHelper, AuthData>(::TopChartsHelper)
 

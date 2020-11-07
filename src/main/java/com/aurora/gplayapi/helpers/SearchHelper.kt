@@ -22,7 +22,7 @@ import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.HttpClient
 import java.util.*
 
-class SearchHelper(authData: AuthData) : BaseHelper(authData) {
+class SearchHelper private constructor(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<SearchHelper, AuthData>(::SearchHelper) {
         private const val SEARCH_TYPE_EXTRA = "_-"

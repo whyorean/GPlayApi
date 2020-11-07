@@ -66,4 +66,6 @@ class AuthHelper {
             return authData
         }
     }
+
+    private constructor()
 }

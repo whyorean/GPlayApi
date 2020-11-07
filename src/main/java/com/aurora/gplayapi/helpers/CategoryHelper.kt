@@ -25,7 +25,7 @@ import com.aurora.gplayapi.data.providers.HeaderProvider
 import com.aurora.gplayapi.network.HttpClient
 import java.util.*
 
-class CategoryHelper(authData: AuthData) : BaseHelper(authData) {
+class CategoryHelper private constructor(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<CategoryHelper, AuthData>(::CategoryHelper)
 
